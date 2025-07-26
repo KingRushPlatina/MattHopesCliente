@@ -185,6 +185,17 @@ class PortfolioLoader {
         }
         this.updateGlobalPortfolioData();
     }
+
+    // Method to refresh all portfolio data
+    async refreshAllPortfolio() {
+        await this.loadAllPortfolioData();
+    }
+
+    // Method to be called when an item is updated/deleted from admin
+    async handlePortfolioChange(collection) {
+        console.log(`Portfolio change detected for ${collection}`);
+        await this.refreshPortfolioType(collection);
+    }
 }
 
 // Initialize portfolio loader when Firebase is ready

@@ -362,6 +362,143 @@
         input[type="file"].form-control::-webkit-file-upload-button:hover {
             background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
         }
+
+        /* Admin review items styling */
+        .admin-review-item {
+            display: flex;
+            align-items: start;
+            padding: 15px;
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            background-color: var(--card-bg-light);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .admin-review-item {
+            border-color: var(--border-color-dark);
+            background-color: var(--card-bg-dark);
+        }
+
+        .hidden-review {
+            opacity: 0.6;
+            border-left: 4px solid #ffc107;
+        }
+
+        .admin-review-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        body.dark-mode .admin-review-item:hover {
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .review-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .review-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: flex-end;
+        }
+
+        @media (max-width: 768px) {
+            .review-actions {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+            
+            .admin-review-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .review-actions {
+                width: 100%;
+                margin-top: 10px;
+                justify-content: flex-start;
+            }
+        }
+
+        /* Preview styling */
+        .modal .review-card {
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 20px;
+            background-color: var(--card-bg-light);
+        }
+
+        body.dark-mode .modal .review-card {
+            border-color: var(--border-color-dark);
+            background-color: var(--card-bg-dark);
+        }
+
+        /* Button group spacing */
+        .review-actions .btn {
+            min-width: 70px;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .review-actions {
+            min-width: 180px;
+        }
+
+        /* Filter controls styling */
+        .card-body input, .card-body select {
+            font-size: 0.9rem;
+        }
+
+        /* Badge improvements */
+        .badge {
+            font-size: 0.7rem;
+        }
+
+        /* Portfolio items styling */
+        .admin-portfolio-item {
+            transition: all 0.3s ease;
+            background-color: var(--card-bg-light);
+        }
+
+        body.dark-mode .admin-portfolio-item {
+            background-color: var(--card-bg-dark);
+            border-color: var(--border-color-dark) !important;
+        }
+
+        .admin-portfolio-item:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        body.dark-mode .admin-portfolio-item:hover {
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-portfolio-item img {
+            border: 1px solid var(--border-color-light);
+        }
+
+        body.dark-mode .admin-portfolio-item img {
+            border-color: var(--border-color-dark);
+        }
+
+        .admin-portfolio-item h6 {
+            color: var(--text-color-light);
+            font-weight: 600;
+        }
+
+        body.dark-mode .admin-portfolio-item h6 {
+            color: var(--text-color-dark);
+        }
+
+        .btn-group-sm .btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -483,6 +620,29 @@
                 <h5><i class="fas fa-list me-2"></i>Manage Reviews</h5>
             </div>
             <div class="card-body">
+                <!-- Reviews Filters -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="reviews-search" placeholder="🔍 Cerca per nome cliente o commento...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" id="reviews-filter">
+                            <option value="all">📋 Tutte le recensioni</option>
+                            <option value="visible">👁️ Solo visibili</option>
+                            <option value="hidden">🙈 Solo nascoste</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-control" id="reviews-sort">
+                            <option value="newest">📅 Più recenti</option>
+                            <option value="oldest">📅 Più vecchie</option>
+                            <option value="rating-high">⭐ Voto alto</option>
+                            <option value="rating-low">⭐ Voto basso</option>
+                            <option value="name">📝 Nome A-Z</option>
+                        </select>
+                    </div>
+                </div>
+                
                 <div id="admin-reviews-list">
                     <div class="text-center">
                         <div class="spinner-border text-primary" role="status">
@@ -621,9 +781,6 @@
                                     <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
                                 </div>
                             </div>
-                                    <div class="form-text">Use GitHub raw URLs for images. First image will be shown in grid view.</div>
-                                </div>
-                            </div>
                             <div class="mb-3">
                                 <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
                                 <textarea class="form-control" name="description" rows="3" required></textarea>
@@ -682,11 +839,661 @@
                 </div>
             </div>
         </div>
+
+        <!-- Edit Review Modal -->
+        <div class="modal fade" id="editReviewModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>
+                            <span class="translatable" data-en="Edit Review" data-it="Modifica Recensione">Edit Review</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-review-form">
+                            <input type="hidden" id="edit-review-id">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <span class="translatable" data-en="Client Name" data-it="Nome Cliente">Client Name</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="edit-client-name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <span class="translatable" data-en="Rating" data-it="Valutazione">Rating</span>
+                                    </label>
+                                    <select class="form-control" id="edit-rating" required>
+                                        <option value="1">1 ⭐</option>
+                                        <option value="2">2 ⭐⭐</option>
+                                        <option value="3">3 ⭐⭐⭐</option>
+                                        <option value="4">4 ⭐⭐⭐⭐</option>
+                                        <option value="5">5 ⭐⭐⭐⭐⭐</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <span class="translatable" data-en="Nationality" data-it="Nazionalità">Nationality</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="edit-nationality" placeholder="🇮🇹 Italy">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">
+                                        <span class="translatable" data-en="Service" data-it="Servizio">Service</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="edit-service" placeholder="3D Modeling">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="translatable" data-en="Profile Image URL" data-it="URL Immagine Profilo">Profile Image URL</span>
+                                </label>
+                                <input type="url" class="form-control" id="edit-profile-image" placeholder="https://example.com/profile.jpg">
+                                <div class="form-text">
+                                    <span class="translatable" data-en="Optional: URL for customer profile image" data-it="Opzionale: URL per l'immagine del profilo cliente">Optional: URL for customer profile image</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="translatable" data-en="Comment" data-it="Commento">Comment</span>
+                                </label>
+                                <textarea class="form-control" id="edit-comment" rows="4" required></textarea>
+                                <div class="form-text">
+                                    <span class="translatable" data-en="Customer's review comment" data-it="Commento della recensione del cliente">Customer's review comment</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <span class="translatable" data-en="Review Date" data-it="Data Recensione">Review Date</span>
+                                </label>
+                                <input type="date" class="form-control" id="edit-review-date">
+                                <div class="form-text">
+                                    <span class="translatable" data-en="Optional: Custom date for the review" data-it="Opzionale: Data personalizzata per la recensione">Optional: Custom date for the review</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    <span class="translatable" data-en="Preview" data-it="Anteprima">Preview</span>
+                                </h6>
+                                <div class="border rounded p-3" style="background-color: var(--card-bg-light);">
+                                    <div id="review-preview">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="me-2" style="min-width:40px;max-width:40px;">
+                                                <div id="preview-profile-image" class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;">
+                                                    <i class='fas fa-user text-white'></i>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h5 class="mb-0" id="preview-client-name">Client Name</h5>
+                                                <div id="preview-rating">⭐⭐⭐⭐⭐</div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <span class="badge bg-primary me-2" id="preview-nationality">🌍 Nationality</span>
+                                            <span class="badge bg-secondary" id="preview-service">🛠️ Service</span>
+                                        </div>
+                                        <p class="mb-2" id="preview-comment">"Review comment will appear here..."</p>
+                                        <small class="text-muted" id="preview-date">Today</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span class="translatable" data-en="Cancel" data-it="Annulla">Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-purple">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="translatable" data-en="Save Changes" data-it="Salva Modifiche">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Build Modal -->
+        <div class="modal fade" id="editBuildModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>
+                            <span class="translatable" data-en="Edit Build" data-it="Modifica Costruzione">Edit Build</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-build-form">
+                            <input type="hidden" id="edit-build-id">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" id="edit-build-title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Images (Any Image URLs)" data-it="Immagini (Qualsiasi URL Immagine)">Images (Any Image URLs)</label>
+                                    <input type="url" class="form-control mb-2" id="edit-build-image1" placeholder="https://images.pexels.com/photos/34150/pexels-photo.jpg" required>
+                                    <input type="url" class="form-control mb-2" id="edit-build-image2" placeholder="https://images.unsplash.com/photo-xyz/image.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-build-image3" placeholder="https://your-cdn.com/image3.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-build-image4" placeholder="https://imgur.com/image4.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-build-image5" placeholder="https://any-image-host.com/image5.jpg">
+                                    <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" id="edit-build-description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" id="edit-build-tags" placeholder="e.g. modern, architecture, luxury" required>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    <span class="translatable" data-en="Preview" data-it="Anteprima">Preview</span>
+                                </h6>
+                                <div class="border rounded p-3" style="background-color: var(--card-bg-light);">
+                                    <div id="build-preview">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img id="preview-build-image" src="https://via.placeholder.com/300x200?text=Build+Preview" alt="Preview" class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5 id="preview-build-title">Build Title</h5>
+                                                <p id="preview-build-description" class="text-muted">Build description will appear here...</p>
+                                                <div id="preview-build-tags">
+                                                    <span class="badge bg-secondary me-1">tag1</span>
+                                                    <span class="badge bg-secondary me-1">tag2</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span class="translatable" data-en="Cancel" data-it="Annulla">Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-purple">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="translatable" data-en="Save Changes" data-it="Salva Modifiche">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Texture Modal -->
+        <div class="modal fade" id="editTextureModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>
+                            <span class="translatable" data-en="Edit Texture" data-it="Modifica Texture">Edit Texture</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-texture-form">
+                            <input type="hidden" id="edit-texture-id">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" id="edit-texture-title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Images (Any Image URLs)" data-it="Immagini (Qualsiasi URL Immagine)">Images (Any Image URLs)</label>
+                                    <input type="url" class="form-control mb-2" id="edit-texture-image1" placeholder="https://images.pexels.com/photos/34150/pexels-photo.jpg" required>
+                                    <input type="url" class="form-control mb-2" id="edit-texture-image2" placeholder="https://images.unsplash.com/photo-xyz/image.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-texture-image3" placeholder="https://your-cdn.com/image3.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-texture-image4" placeholder="https://imgur.com/image4.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-texture-image5" placeholder="https://any-image-host.com/image5.jpg">
+                                    <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" id="edit-texture-description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" id="edit-texture-tags" placeholder="e.g. metal, industrial, modern" required>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    <span class="translatable" data-en="Preview" data-it="Anteprima">Preview</span>
+                                </h6>
+                                <div class="border rounded p-3" style="background-color: var(--card-bg-light);">
+                                    <div id="texture-preview">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img id="preview-texture-image" src="https://via.placeholder.com/300x200?text=Texture+Preview" alt="Preview" class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5 id="preview-texture-title">Texture Title</h5>
+                                                <p id="preview-texture-description" class="text-muted">Texture description will appear here...</p>
+                                                <div id="preview-texture-tags">
+                                                    <span class="badge bg-secondary me-1">tag1</span>
+                                                    <span class="badge bg-secondary me-1">tag2</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span class="translatable" data-en="Cancel" data-it="Annulla">Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-purple">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="translatable" data-en="Save Changes" data-it="Salva Modifiche">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Model Modal -->
+        <div class="modal fade" id="editModelModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>
+                            <span class="translatable" data-en="Edit Model" data-it="Modifica Modello">Edit Model</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-model-form">
+                            <input type="hidden" id="edit-model-id">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" id="edit-model-title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Images (Any Image URLs)" data-it="Immagini (Qualsiasi URL Immagine)">Images (Any Image URLs)</label>
+                                    <input type="url" class="form-control mb-2" id="edit-model-image1" placeholder="https://images.pexels.com/photos/34150/pexels-photo.jpg" required>
+                                    <input type="url" class="form-control mb-2" id="edit-model-image2" placeholder="https://images.unsplash.com/photo-xyz/image.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-model-image3" placeholder="https://your-cdn.com/image3.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-model-image4" placeholder="https://imgur.com/image4.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-model-image5" placeholder="https://any-image-host.com/image5.jpg">
+                                    <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" id="edit-model-description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" id="edit-model-tags" placeholder="e.g. characters, furniture, vehicles" required>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    <span class="translatable" data-en="Preview" data-it="Anteprima">Preview</span>
+                                </h6>
+                                <div class="border rounded p-3" style="background-color: var(--card-bg-light);">
+                                    <div id="model-preview">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <img id="preview-model-image" src="https://via.placeholder.com/300x200?text=Model+Preview" alt="Preview" class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5 id="preview-model-title">Model Title</h5>
+                                                <p id="preview-model-description" class="text-muted">Model description will appear here...</p>
+                                                <div id="preview-model-tags">
+                                                    <span class="badge bg-secondary me-1">tag1</span>
+                                                    <span class="badge bg-secondary me-1">tag2</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span class="translatable" data-en="Cancel" data-it="Annulla">Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-purple">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="translatable" data-en="Save Changes" data-it="Salva Modifiche">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/reviews-manager.js"></script>
+    <script src="assets/js/portfolio-loader.js"></script>
+    
+    <script>
+        // Real-time preview for edit review modal
+        function setupEditReviewPreview() {
+            const form = document.getElementById('edit-review-form');
+            if (!form) return;
+
+            const clientNameInput = document.getElementById('edit-client-name');
+            const ratingSelect = document.getElementById('edit-rating');
+            const nationalityInput = document.getElementById('edit-nationality');
+            const serviceInput = document.getElementById('edit-service');
+            const profileImageInput = document.getElementById('edit-profile-image');
+            const commentInput = document.getElementById('edit-comment');
+            const reviewDateInput = document.getElementById('edit-review-date');
+
+            const previewClientName = document.getElementById('preview-client-name');
+            const previewRating = document.getElementById('preview-rating');
+            const previewNationality = document.getElementById('preview-nationality');
+            const previewService = document.getElementById('preview-service');
+            const previewProfileImage = document.getElementById('preview-profile-image');
+            const previewComment = document.getElementById('preview-comment');
+            const previewDate = document.getElementById('preview-date');
+
+            function generateStarsPreview(rating) {
+                const fullStars = Math.floor(rating);
+                const halfStar = rating % 1 !== 0;
+                const emptyStars = 5 - Math.ceil(rating);
+
+                let stars = '';
+                for (let i = 0; i < fullStars; i++) {
+                    stars += '⭐';
+                }
+                if (halfStar) {
+                    stars += '⭐'; // Use full star for simplicity in preview
+                }
+                return stars || '⭐';
+            }
+
+            function updatePreview() {
+                // Update client name
+                previewClientName.textContent = clientNameInput.value || 'Client Name';
+                
+                // Update rating
+                const rating = parseInt(ratingSelect.value) || 5;
+                previewRating.textContent = generateStarsPreview(rating);
+                
+                // Update nationality
+                previewNationality.textContent = nationalityInput.value || '🌍 Nationality';
+                
+                // Update service
+                previewService.textContent = '🛠️ ' + (serviceInput.value || 'Service');
+                
+                // Update profile image
+                if (profileImageInput.value && profileImageInput.value.trim()) {
+                    previewProfileImage.innerHTML = `<img src="${profileImageInput.value}" alt="Profile" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">`;
+                } else {
+                    previewProfileImage.innerHTML = '<i class="fas fa-user text-white"></i>';
+                }
+                
+                // Update comment
+                previewComment.textContent = '"' + (commentInput.value || 'Review comment will appear here...') + '"';
+                
+                // Update date
+                if (reviewDateInput.value) {
+                    const date = new Date(reviewDateInput.value);
+                    previewDate.textContent = date.toLocaleDateString('it-IT');
+                } else {
+                    previewDate.textContent = new Date().toLocaleDateString('it-IT');
+                }
+            }
+
+            // Add event listeners for real-time preview
+            clientNameInput.addEventListener('input', updatePreview);
+            ratingSelect.addEventListener('change', updatePreview);
+            nationalityInput.addEventListener('input', updatePreview);
+            serviceInput.addEventListener('input', updatePreview);
+            profileImageInput.addEventListener('input', updatePreview);
+            commentInput.addEventListener('input', updatePreview);
+            reviewDateInput.addEventListener('change', updatePreview);
+
+            // Handle form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const reviewId = document.getElementById('edit-review-id').value;
+                const reviewData = {
+                    clientName: clientNameInput.value,
+                    rating: parseFloat(ratingSelect.value),
+                    comment: commentInput.value,
+                    nationality: nationalityInput.value || '',
+                    service: serviceInput.value || '',
+                    profileImage: profileImageInput.value || ''
+                };
+
+                // Add custom date if provided
+                if (reviewDateInput.value) {
+                    const customDate = new Date(reviewDateInput.value);
+                    reviewData.reviewDate = reviewDateInput.value;
+                }
+
+                try {
+                    await reviewsManager.updateReview(reviewId, reviewData);
+                    bootstrap.Modal.getInstance(document.getElementById('editReviewModal')).hide();
+                } catch (error) {
+                    console.error('Error updating review:', error);
+                    alert('Error updating review: ' + error.message);
+                }
+            });
+        }
+
+        // Initialize preview when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEditReviewPreview();
+            setupPortfolioEditPreviews();
+        });
+
+        // Setup portfolio edit previews
+        function setupPortfolioEditPreviews() {
+            // Build edit preview
+            setupBuildEditPreview();
+            // Texture edit preview
+            setupTextureEditPreview();
+            // Model edit preview
+            setupModelEditPreview();
+        }
+
+        function setupBuildEditPreview() {
+            const form = document.getElementById('edit-build-form');
+            if (!form) return;
+
+            const titleInput = document.getElementById('edit-build-title');
+            const descriptionInput = document.getElementById('edit-build-description');
+            const tagsInput = document.getElementById('edit-build-tags');
+            const image1Input = document.getElementById('edit-build-image1');
+
+            const previewTitle = document.getElementById('preview-build-title');
+            const previewDescription = document.getElementById('preview-build-description');
+            const previewTags = document.getElementById('preview-build-tags');
+            const previewImage = document.getElementById('preview-build-image');
+
+            function updateBuildPreview() {
+                previewTitle.textContent = titleInput.value || 'Build Title';
+                previewDescription.textContent = descriptionInput.value || 'Build description will appear here...';
+                
+                if (image1Input.value && image1Input.value.trim()) {
+                    previewImage.src = image1Input.value;
+                    previewImage.onerror = () => previewImage.src = 'https://via.placeholder.com/300x200?text=Build+Preview';
+                } else {
+                    previewImage.src = 'https://via.placeholder.com/300x200?text=Build+Preview';
+                }
+                
+                const tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                previewTags.innerHTML = tags.length > 0 ? 
+                    tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') :
+                    '<span class="badge bg-secondary me-1">tag1</span><span class="badge bg-secondary me-1">tag2</span>';
+            }
+
+            titleInput.addEventListener('input', updateBuildPreview);
+            descriptionInput.addEventListener('input', updateBuildPreview);
+            tagsInput.addEventListener('input', updateBuildPreview);
+            image1Input.addEventListener('input', updateBuildPreview);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const buildId = document.getElementById('edit-build-id').value;
+                await portfolioManager.updateItem('builds', buildId, {
+                    title: titleInput.value,
+                    description: descriptionInput.value,
+                    tags: tagsInput.value.split(',').map(tag => tag.trim()),
+                    images: [
+                        document.getElementById('edit-build-image1').value,
+                        document.getElementById('edit-build-image2').value,
+                        document.getElementById('edit-build-image3').value,
+                        document.getElementById('edit-build-image4').value,
+                        document.getElementById('edit-build-image5').value
+                    ].filter(img => img && img.trim())
+                });
+                bootstrap.Modal.getInstance(document.getElementById('editBuildModal')).hide();
+            });
+        }
+
+        function setupTextureEditPreview() {
+            const form = document.getElementById('edit-texture-form');
+            if (!form) return;
+
+            const titleInput = document.getElementById('edit-texture-title');
+            const descriptionInput = document.getElementById('edit-texture-description');
+            const tagsInput = document.getElementById('edit-texture-tags');
+            const image1Input = document.getElementById('edit-texture-image1');
+
+            const previewTitle = document.getElementById('preview-texture-title');
+            const previewDescription = document.getElementById('preview-texture-description');
+            const previewTags = document.getElementById('preview-texture-tags');
+            const previewImage = document.getElementById('preview-texture-image');
+
+            function updateTexturePreview() {
+                previewTitle.textContent = titleInput.value || 'Texture Title';
+                previewDescription.textContent = descriptionInput.value || 'Texture description will appear here...';
+                
+                if (image1Input.value && image1Input.value.trim()) {
+                    previewImage.src = image1Input.value;
+                    previewImage.onerror = () => previewImage.src = 'https://via.placeholder.com/300x200?text=Texture+Preview';
+                } else {
+                    previewImage.src = 'https://via.placeholder.com/300x200?text=Texture+Preview';
+                }
+                
+                const tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                previewTags.innerHTML = tags.length > 0 ? 
+                    tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') :
+                    '<span class="badge bg-secondary me-1">tag1</span><span class="badge bg-secondary me-1">tag2</span>';
+            }
+
+            titleInput.addEventListener('input', updateTexturePreview);
+            descriptionInput.addEventListener('input', updateTexturePreview);
+            tagsInput.addEventListener('input', updateTexturePreview);
+            image1Input.addEventListener('input', updateTexturePreview);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const textureId = document.getElementById('edit-texture-id').value;
+                await portfolioManager.updateItem('textures', textureId, {
+                    title: titleInput.value,
+                    description: descriptionInput.value,
+                    tags: tagsInput.value.split(',').map(tag => tag.trim()),
+                    images: [
+                        document.getElementById('edit-texture-image1').value,
+                        document.getElementById('edit-texture-image2').value,
+                        document.getElementById('edit-texture-image3').value,
+                        document.getElementById('edit-texture-image4').value,
+                        document.getElementById('edit-texture-image5').value
+                    ].filter(img => img && img.trim())
+                });
+                bootstrap.Modal.getInstance(document.getElementById('editTextureModal')).hide();
+            });
+        }
+
+        function setupModelEditPreview() {
+            const form = document.getElementById('edit-model-form');
+            if (!form) return;
+
+            const titleInput = document.getElementById('edit-model-title');
+            const descriptionInput = document.getElementById('edit-model-description');
+            const tagsInput = document.getElementById('edit-model-tags');
+            const image1Input = document.getElementById('edit-model-image1');
+
+            const previewTitle = document.getElementById('preview-model-title');
+            const previewDescription = document.getElementById('preview-model-description');
+            const previewTags = document.getElementById('preview-model-tags');
+            const previewImage = document.getElementById('preview-model-image');
+
+            function updateModelPreview() {
+                previewTitle.textContent = titleInput.value || 'Model Title';
+                previewDescription.textContent = descriptionInput.value || 'Model description will appear here...';
+                
+                if (image1Input.value && image1Input.value.trim()) {
+                    previewImage.src = image1Input.value;
+                    previewImage.onerror = () => previewImage.src = 'https://via.placeholder.com/300x200?text=Model+Preview';
+                } else {
+                    previewImage.src = 'https://via.placeholder.com/300x200?text=Model+Preview';
+                }
+                
+                const tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                previewTags.innerHTML = tags.length > 0 ? 
+                    tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('') :
+                    '<span class="badge bg-secondary me-1">tag1</span><span class="badge bg-secondary me-1">tag2</span>';
+            }
+
+            titleInput.addEventListener('input', updateModelPreview);
+            descriptionInput.addEventListener('input', updateModelPreview);
+            tagsInput.addEventListener('input', updateModelPreview);
+            image1Input.addEventListener('input', updateModelPreview);
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const modelId = document.getElementById('edit-model-id').value;
+                await portfolioManager.updateItem('models', modelId, {
+                    title: titleInput.value,
+                    description: descriptionInput.value,
+                    tags: tagsInput.value.split(',').map(tag => tag.trim()),
+                    images: [
+                        document.getElementById('edit-model-image1').value,
+                        document.getElementById('edit-model-image2').value,
+                        document.getElementById('edit-model-image3').value,
+                        document.getElementById('edit-model-image4').value,
+                        document.getElementById('edit-model-image5').value
+                    ].filter(img => img && img.trim())
+                });
+                bootstrap.Modal.getInstance(document.getElementById('editModelModal')).hide();
+            });
+        }
+    </script>
     
     <script>
         // Language system (same as login.html)
@@ -769,6 +1576,9 @@
         // Portfolio Management Functions
         class PortfolioManager {
             constructor() {
+                this.currentBuilds = {};
+                this.currentTextures = {};
+                this.currentModels = {};
                 this.initializePortfolioManagement();
             }
 
@@ -784,25 +1594,46 @@
 
             setupFormEventListeners() {
                 // Builds form
-                document.getElementById('add-build-form').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.addPortfolioItem('builds', new FormData(e.target), e.target);
-                });
+                const buildForm = document.getElementById('add-build-form');
+                if (buildForm) {
+                    buildForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        console.log('Build form submitted');
+                        this.addPortfolioItem('builds', new FormData(e.target), e.target);
+                    });
+                } else {
+                    console.error('Build form not found!');
+                }
 
                 // Textures form
-                document.getElementById('add-texture-form').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.addPortfolioItem('textures', new FormData(e.target), e.target);
-                });
+                const textureForm = document.getElementById('add-texture-form');
+                if (textureForm) {
+                    textureForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        console.log('Texture form submitted');
+                        this.addPortfolioItem('textures', new FormData(e.target), e.target);
+                    });
+                } else {
+                    console.error('Texture form not found!');
+                }
 
                 // Models form
-                document.getElementById('add-model-form').addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    this.addPortfolioItem('models', new FormData(e.target), e.target);
-                });
+                const modelForm = document.getElementById('add-model-form');
+                if (modelForm) {
+                    modelForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        console.log('Model form submitted');
+                        this.addPortfolioItem('models', new FormData(e.target), e.target);
+                    });
+                } else {
+                    console.error('Model form not found!');
+                }
             }
 
             async addPortfolioItem(collection, formData, formElement) {
+                console.log(`Adding ${collection} item...`);
+                console.log('Form data:', Object.fromEntries(formData.entries()));
+                
                 const submitBtn = formElement.querySelector('button[type="submit"]');
                 const originalBtnText = submitBtn.innerHTML;
                 
@@ -835,10 +1666,11 @@
                         images: images,
                         description: formData.get('description'),
                         tags: formData.get('tags').split(',').map(tag => tag.trim()),
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        id: 'item_' + Date.now()
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
+                    console.log('Data to be saved:', data);
+                    
                     await firebase.firestore().collection(collection).add(data);
                     
                     // Show success message
@@ -858,23 +1690,38 @@
                     // Reload the list
                     this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
 
+                    // Notify portfolio loader if it exists (for main site)
+                    if (window.portfolioLoader) {
+                        await window.portfolioLoader.handlePortfolioChange(collection);
+                    }
+
                 } catch (error) {
                     console.error(`Error adding ${collection}:`, error);
                     alert(`Error adding ${collection.slice(0, -1)}: ${error.message || 'Please try again.'}`);
                 } finally {
-                    // Reset button
+                    // Restore button state
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalBtnText;
                 }
             }
 
             async loadBuilds() {
+                console.log('Loading builds...');
                 try {
                     const snapshot = await firebase.firestore().collection('builds').orderBy('createdAt', 'desc').get();
                     const builds = [];
+                    this.currentBuilds = {}; // Reset
+                    
                     snapshot.forEach(doc => {
-                        builds.push({ id: doc.id, ...doc.data() });
+                        const buildData = { id: doc.id, ...doc.data() };
+                        builds.push(buildData);
+                        this.currentBuilds[doc.id] = buildData;
+                        console.log('Loaded build:', doc.id, buildData.title);
                     });
+                    
+                    console.log('Total builds loaded:', builds.length);
+                    console.log('Current builds keys:', Object.keys(this.currentBuilds));
+                    
                     this.displayPortfolioItems('builds', builds);
                 } catch (error) {
                     console.error('Error loading builds:', error);
@@ -883,12 +1730,22 @@
             }
 
             async loadTextures() {
+                console.log('Loading textures...');
                 try {
                     const snapshot = await firebase.firestore().collection('textures').orderBy('createdAt', 'desc').get();
                     const textures = [];
+                    this.currentTextures = {}; // Reset
+                    
                     snapshot.forEach(doc => {
-                        textures.push({ id: doc.id, ...doc.data() });
+                        const textureData = { id: doc.id, ...doc.data() };
+                        textures.push(textureData);
+                        this.currentTextures[doc.id] = textureData;
+                        console.log('Loaded texture:', doc.id, textureData.title);
                     });
+                    
+                    console.log('Total textures loaded:', textures.length);
+                    console.log('Current textures keys:', Object.keys(this.currentTextures));
+                    
                     this.displayPortfolioItems('textures', textures);
                 } catch (error) {
                     console.error('Error loading textures:', error);
@@ -897,12 +1754,22 @@
             }
 
             async loadModels() {
+                console.log('Loading models...');
                 try {
                     const snapshot = await firebase.firestore().collection('models').orderBy('createdAt', 'desc').get();
                     const models = [];
+                    this.currentModels = {}; // Reset
+                    
                     snapshot.forEach(doc => {
-                        models.push({ id: doc.id, ...doc.data() });
+                        const modelData = { id: doc.id, ...doc.data() };
+                        models.push(modelData);
+                        this.currentModels[doc.id] = modelData;
+                        console.log('Loaded model:', doc.id, modelData.title);
                     });
+                    
+                    console.log('Total models loaded:', models.length);
+                    console.log('Current models keys:', Object.keys(this.currentModels));
+                    
                     this.displayPortfolioItems('models', models);
                 } catch (error) {
                     console.error('Error loading models:', error);
@@ -918,47 +1785,279 @@
                     return;
                 }
 
-                const html = items.map(item => `
-                    <div class="admin-portfolio-item border rounded p-2 mb-2" data-id="${item.id}">
+                console.log(`Displaying ${collection} items:`, items.map(item => ({ 
+                    documentId: item.id, 
+                    title: item.title,
+                    customId: item.id // This might be different from documentId
+                })));
+
+                const html = items.map(item => {
+                    // Use document ID (item.id from Firestore)
+                    const itemId = item.id; // This is the Firestore document ID
+                    console.log(`Creating button for ${collection} item with document ID:`, itemId);
+                    
+                    return `
+                    <div class="admin-portfolio-item border rounded p-2 mb-2" data-id="${itemId}">
                         <div class="d-flex align-items-center">
                             <img src="${item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/40x40?text=No+Image'}" alt="${item.title}" class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0">${item.title}</h6>
                                 <small class="text-muted">${item.tags ? item.tags.join(', ') : 'No tags'}</small>
+                                <small class="d-block text-info">Doc ID: ${itemId}</small>
                             </div>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-warning btn-sm" onclick="portfolioManager.editItem('${collection}', '${item.id}')">
+                                <button class="btn btn-outline-warning btn-sm" onclick="portfolioManager.editItem('${collection}', '${itemId}')" title="Modifica">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="portfolioManager.deleteItem('${collection}', '${item.id}')">
+                                <button class="btn btn-outline-danger btn-sm" onclick="portfolioManager.deleteItem('${collection}', '${itemId}')" title="Elimina">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
 
                 container.innerHTML = html;
             }
 
             async deleteItem(collection, itemId) {
-                if (confirm(`Are you sure you want to delete this ${collection.slice(0, -1)}?`)) {
+                if (confirm(`Sei sicuro di voler eliminare questo ${collection.slice(0, -1)}?`)) {
                     try {
-                        await firebase.firestore().collection(collection).doc(itemId).delete();
-                        alert(`${collection.slice(0, -1)} deleted successfully!`);
+                        // Search for the item by custom ID to get the document ID
+                        let documentId = null;
+                        
+                        if (collection === 'builds') {
+                            for (const [docId, itemData] of Object.entries(this.currentBuilds)) {
+                                if (itemData.id === itemId) {
+                                    documentId = docId;
+                                    break;
+                                }
+                            }
+                        } else if (collection === 'textures') {
+                            for (const [docId, itemData] of Object.entries(this.currentTextures)) {
+                                if (itemData.id === itemId) {
+                                    documentId = docId;
+                                    break;
+                                }
+                            }
+                        } else if (collection === 'models') {
+                            for (const [docId, itemData] of Object.entries(this.currentModels)) {
+                                if (itemData.id === itemId) {
+                                    documentId = docId;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (!documentId) {
+                            alert(`Errore: ${collection.slice(0, -1)} non trovato con ID: ${itemId}`);
+                            return;
+                        }
+
+                        await firebase.firestore().collection(collection).doc(documentId).delete();
+                        alert(`${collection.slice(0, -1)} eliminato con successo!`);
+                        
+                        // Remove from local storage using document ID
+                        if (collection === 'builds') delete this.currentBuilds[documentId];
+                        else if (collection === 'textures') delete this.currentTextures[documentId];
+                        else if (collection === 'models') delete this.currentModels[documentId];
                         
                         // Reload the list
                         this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
+
+                        // Notify portfolio loader if it exists (for main site)
+                        if (window.portfolioLoader) {
+                            await window.portfolioLoader.handlePortfolioChange(collection);
+                        }
                     } catch (error) {
                         console.error(`Error deleting ${collection}:`, error);
-                        alert(`Error deleting ${collection.slice(0, -1)}. Please try again.`);
+                        alert(`Errore nell'eliminazione del ${collection.slice(0, -1)}. Riprova.`);
                     }
                 }
             }
 
             async editItem(collection, itemId) {
-                // For now, just show an alert. You can implement edit functionality later
-                alert('Edit functionality coming soon!');
+                console.log(`Editing ${collection} item:`, itemId);
+                console.log(`Current ${collection} data:`, this[`current${collection.charAt(0).toUpperCase() + collection.slice(1)}`]);
+                
+                let item;
+                let documentId;
+                
+                // Search for item by custom ID field instead of document ID
+                if (collection === 'builds') {
+                    console.log('All current builds:', Object.keys(this.currentBuilds));
+                    for (const [docId, itemData] of Object.entries(this.currentBuilds)) {
+                        if (itemData.id === itemId) {
+                            item = itemData;
+                            documentId = docId;
+                            break;
+                        }
+                    }
+                } else if (collection === 'textures') {
+                    console.log('All current textures:', Object.keys(this.currentTextures));
+                    for (const [docId, itemData] of Object.entries(this.currentTextures)) {
+                        if (itemData.id === itemId) {
+                            item = itemData;
+                            documentId = docId;
+                            break;
+                        }
+                    }
+                } else if (collection === 'models') {
+                    console.log('All current models:', Object.keys(this.currentModels));
+                    for (const [docId, itemData] of Object.entries(this.currentModels)) {
+                        if (itemData.id === itemId) {
+                            item = itemData;
+                            documentId = docId;
+                            break;
+                        }
+                    }
+                }
+
+                if (!item) {
+                    console.error(`${collection} item not found with custom ID:`, itemId);
+                    console.error('Available custom IDs:', Object.values(this[`current${collection.charAt(0).toUpperCase() + collection.slice(1)}`]).map(item => item.id || 'no-id'));
+                    console.error('Available document IDs:', Object.keys(this[`current${collection.charAt(0).toUpperCase() + collection.slice(1)}`]));
+                    
+                    // Try to reload and find the item
+                    console.log('Attempting to reload data and retry...');
+                    await this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
+                    
+                    // Try again after reload with custom ID search
+                    if (collection === 'builds') {
+                        for (const [docId, itemData] of Object.entries(this.currentBuilds)) {
+                            if (itemData.id === itemId) {
+                                item = itemData;
+                                documentId = docId;
+                                break;
+                            }
+                        }
+                    } else if (collection === 'textures') {
+                        for (const [docId, itemData] of Object.entries(this.currentTextures)) {
+                            if (itemData.id === itemId) {
+                                item = itemData;
+                                documentId = docId;
+                                break;
+                            }
+                        }
+                    } else if (collection === 'models') {
+                        for (const [docId, itemData] of Object.entries(this.currentModels)) {
+                            if (itemData.id === itemId) {
+                                item = itemData;
+                                documentId = docId;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (!item) {
+                        alert(`Errore: ${collection} non trovato! ID: ${itemId}`);
+                        return;
+                    } else {
+                        console.log('Item found after reload:', item);
+                        console.log('Document ID:', documentId);
+                    }
+                } else {
+                    console.log('Item found:', item);
+                    console.log('Document ID:', documentId);
+                }
+
+                console.log('Item data:', item);
+
+                // Populate the edit modal based on collection type
+                // Use the document ID for form operations, not the custom ID
+                if (collection === 'builds') {
+                    document.getElementById('edit-build-id').value = documentId; // Use document ID for updates
+                    document.getElementById('edit-build-title').value = item.title || '';
+                    document.getElementById('edit-build-description').value = item.description || '';
+                    document.getElementById('edit-build-tags').value = item.tags ? item.tags.join(', ') : '';
+                    
+                    // Populate image fields
+                    for (let i = 1; i <= 5; i++) {
+                        const imageField = document.getElementById(`edit-build-image${i}`);
+                        if (imageField) {
+                            imageField.value = (item.images && item.images[i-1]) ? item.images[i-1] : '';
+                        }
+                    }
+                    
+                    // Trigger preview update
+                    document.getElementById('edit-build-title').dispatchEvent(new Event('input'));
+                    
+                    console.log('Opening build modal...');
+                    const modal = new bootstrap.Modal(document.getElementById('editBuildModal'));
+                    modal.show();
+                    
+                } else if (collection === 'textures') {
+                    document.getElementById('edit-texture-id').value = documentId; // Use document ID for updates
+                    document.getElementById('edit-texture-title').value = item.title || '';
+                    document.getElementById('edit-texture-description').value = item.description || '';
+                    document.getElementById('edit-texture-tags').value = item.tags ? item.tags.join(', ') : '';
+                    
+                    // Populate image fields
+                    for (let i = 1; i <= 5; i++) {
+                        const imageField = document.getElementById(`edit-texture-image${i}`);
+                        if (imageField) {
+                            imageField.value = (item.images && item.images[i-1]) ? item.images[i-1] : '';
+                        }
+                    }
+                    
+                    // Trigger preview update
+                    document.getElementById('edit-texture-title').dispatchEvent(new Event('input'));
+                    
+                    console.log('Opening texture modal...');
+                    const modal = new bootstrap.Modal(document.getElementById('editTextureModal'));
+                    modal.show();
+                    
+                } else if (collection === 'models') {
+                    document.getElementById('edit-model-id').value = documentId; // Use document ID for updates
+                    document.getElementById('edit-model-title').value = item.title || '';
+                    document.getElementById('edit-model-description').value = item.description || '';
+                    document.getElementById('edit-model-tags').value = item.tags ? item.tags.join(', ') : '';
+                    
+                    // Populate image fields
+                    for (let i = 1; i <= 5; i++) {
+                        const imageField = document.getElementById(`edit-model-image${i}`);
+                        if (imageField) {
+                            imageField.value = (item.images && item.images[i-1]) ? item.images[i-1] : '';
+                        }
+                    }
+                    
+                    // Trigger preview update
+                    document.getElementById('edit-model-title').dispatchEvent(new Event('input'));
+                    
+                    console.log('Opening model modal...');
+                    const modal = new bootstrap.Modal(document.getElementById('editModelModal'));
+                    modal.show();
+                }
+            }
+
+            async updateItem(collection, itemId, itemData) {
+                try {
+                    const updateData = {
+                        ...itemData,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    await firebase.firestore().collection(collection).doc(itemId).update(updateData);
+                    alert(`${collection.slice(0, -1)} aggiornato con successo!`);
+                    
+                    // Update local storage
+                    if (collection === 'builds') this.currentBuilds[itemId] = { ...this.currentBuilds[itemId], ...itemData };
+                    else if (collection === 'textures') this.currentTextures[itemId] = { ...this.currentTextures[itemId], ...itemData };
+                    else if (collection === 'models') this.currentModels[itemId] = { ...this.currentModels[itemId], ...itemData };
+                    
+                    // Reload the list
+                    this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
+
+                    // Notify portfolio loader if it exists (for main site)
+                    if (window.portfolioLoader) {
+                        await window.portfolioLoader.handlePortfolioChange(collection);
+                    }
+                } catch (error) {
+                    console.error(`Error updating ${collection}:`, error);
+                    alert(`Errore nell'aggiornamento del ${collection.slice(0, -1)}. Riprova.`);
+                    throw error;
+                }
             }
         }
 

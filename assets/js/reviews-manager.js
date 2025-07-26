@@ -6,6 +6,8 @@ class ReviewsManager {
         this.auth = null;
         this.reviewsCollection = null;
         this.reviewComments = {}; // Store full and truncated comments for toggling
+        this.currentReviews = {}; // Store current reviews for easy access during editing
+        this.allReviews = []; // Store all reviews for filtering
         this.initFirebase();
     }
 
@@ -147,6 +149,10 @@ class ReviewsManager {
     }
 
     async deleteReview(reviewId) {
+        if (!confirm('Sei sicuro di voler eliminare questa recensione?')) {
+            return;
+        }
+        
         try {
             await this.reviewsCollection.doc(reviewId).delete();
             this.showNotification('Recensione eliminata', 'success');
@@ -155,6 +161,67 @@ class ReviewsManager {
             console.error('Error deleting review:', error);
             this.showNotification('Errore nell\'eliminare la recensione', 'error');
         }
+    }
+
+    async updateReview(reviewId, reviewData) {
+        try {
+            const dataToUpdate = {
+                ...reviewData,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Handle custom date if provided
+            if (reviewData.reviewDate) {
+                const customDate = new Date(reviewData.reviewDate);
+                dataToUpdate.createdAt = firebase.firestore.Timestamp.fromDate(customDate);
+                delete dataToUpdate.reviewDate; // Remove the reviewDate field since we set createdAt
+            }
+            
+            await this.reviewsCollection.doc(reviewId).update(dataToUpdate);
+            this.showNotification('Recensione aggiornata con successo!', 'success');
+            this.loadReviews();
+            return true;
+        } catch (error) {
+            console.error('Error updating review:', error);
+            this.showNotification('Errore nell\'aggiornare la recensione', 'error');
+            throw error;
+        }
+    }
+
+    editReview(reviewId, reviewData) {
+        // Populate the edit modal with current review data
+        document.getElementById('edit-review-id').value = reviewId;
+        document.getElementById('edit-client-name').value = reviewData.clientName || '';
+        document.getElementById('edit-rating').value = reviewData.rating || 5;
+        document.getElementById('edit-nationality').value = reviewData.nationality || '';
+        document.getElementById('edit-service').value = reviewData.service || '';
+        document.getElementById('edit-profile-image').value = reviewData.profileImage || '';
+        document.getElementById('edit-comment').value = reviewData.comment || '';
+        
+        // Set the date field if createdAt exists
+        if (reviewData.createdAt) {
+            let date;
+            if (reviewData.createdAt.toDate) {
+                date = reviewData.createdAt.toDate();
+            } else if (reviewData.createdAt instanceof Date) {
+                date = reviewData.createdAt;
+            }
+            
+            if (date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                document.getElementById('edit-review-date').value = `${year}-${month}-${day}`;
+            }
+        }
+
+        // Trigger preview update
+        const event = new Event('input', { bubbles: true });
+        document.getElementById('edit-client-name').dispatchEvent(event);
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('editReviewModal'));
+        modal.show();
     }
 
     async toggleReviewVisibility(reviewId, currentVisibility) {
@@ -245,8 +312,78 @@ class ReviewsManager {
         const adminReviewsList = document.getElementById('admin-reviews-list');
         if (!adminReviewsList || !this.currentUser) return;
 
+        // Store all reviews for filtering and searching
+        this.allReviews = [...reviews];
+        this.currentReviews = {};
+        reviews.forEach(review => {
+            this.currentReviews[review.id] = review;
+        });
+
+        // Apply current filters
+        this.filterAndDisplayReviews();
+    }
+
+    filterAndDisplayReviews() {
+        if (!this.allReviews) return;
+
+        let filteredReviews = [...this.allReviews];
+
+        // Apply search filter
+        const searchTerm = document.getElementById('reviews-search')?.value.toLowerCase() || '';
+        if (searchTerm) {
+            filteredReviews = filteredReviews.filter(review => 
+                review.clientName.toLowerCase().includes(searchTerm) ||
+                review.comment.toLowerCase().includes(searchTerm) ||
+                (review.nationality && review.nationality.toLowerCase().includes(searchTerm)) ||
+                (review.service && review.service.toLowerCase().includes(searchTerm))
+            );
+        }
+
+        // Apply visibility filter
+        const visibilityFilter = document.getElementById('reviews-filter')?.value || 'all';
+        if (visibilityFilter === 'visible') {
+            filteredReviews = filteredReviews.filter(review => review.visible);
+        } else if (visibilityFilter === 'hidden') {
+            filteredReviews = filteredReviews.filter(review => !review.visible);
+        }
+
+        // Apply sorting
+        const sortOption = document.getElementById('reviews-sort')?.value || 'newest';
+        filteredReviews.sort((a, b) => {
+            switch (sortOption) {
+                case 'oldest':
+                    return a.createdAt?.toDate() - b.createdAt?.toDate() || 0;
+                case 'rating-high':
+                    return b.rating - a.rating;
+                case 'rating-low':
+                    return a.rating - b.rating;
+                case 'name':
+                    return a.clientName.localeCompare(b.clientName);
+                case 'newest':
+                default:
+                    return b.createdAt?.toDate() - a.createdAt?.toDate() || 0;
+            }
+        });
+
+        this.renderFilteredReviews(filteredReviews);
+    }
+
+    renderFilteredReviews(reviews) {
+        const adminReviewsList = document.getElementById('admin-reviews-list');
+        if (!adminReviewsList) return;
+
+        if (reviews.length === 0) {
+            adminReviewsList.innerHTML = `
+                <div class="text-center py-4">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Nessuna recensione trovata con i filtri correnti.</p>
+                </div>
+            `;
+            return;
+        }
+
         adminReviewsList.innerHTML = reviews.map(review => {
-            const maxChars = 150; // Limite di caratteri per il commento
+            const maxChars = 150;
             const comment = this.escapeHtml(review.comment);
             const truncatedComment = comment.length > maxChars ? comment.substring(0, maxChars) + '...' : comment;
             const needsExpansion = comment.length > maxChars;
@@ -261,6 +398,7 @@ class ReviewsManager {
                     <div class="mb-2">
                         <span class="badge bg-primary me-2">${review.nationality || '🌍 Unknown'}</span>
                         <span class="badge bg-secondary">🛠️ ${review.service || 'General Service'}</span>
+                        ${!review.visible ? '<span class="badge bg-warning text-dark ms-2">👁️‍🗨️ Nascosta</span>' : ''}
                     </div>
                     <p class="review-comment-text" id="comment-${review.id}">${truncatedComment}</p>
                     ${needsExpansion ? `
@@ -271,11 +409,17 @@ class ReviewsManager {
                     <small class="d-block mt-2">${this.formatDate(review.createdAt)}</small>
                 </div>
                 <div class="review-actions">
-                    <button class="btn btn-sm btn-outline-warning" onclick="reviewsManager.toggleReviewVisibility('${review.id}', ${review.visible})">
-                        ${review.visible ? 'Nascondi' : 'Mostra'}
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="reviewsManager.openEditModal('${review.id}')">
+                        <i class="fas fa-edit"></i> Modifica
+                    </button>
+                    <button class="btn btn-sm btn-outline-info me-1" onclick="reviewsManager.duplicateReview('${review.id}')" title="Duplica recensione">
+                        <i class="fas fa-copy"></i> Duplica
+                    </button>
+                    <button class="btn btn-sm btn-outline-warning me-1" onclick="reviewsManager.toggleReviewVisibility('${review.id}', ${review.visible})">
+                        ${review.visible ? '<i class="fas fa-eye-slash"></i> Nascondi' : '<i class="fas fa-eye"></i> Mostra'}
                     </button>
                     <button class="btn btn-sm btn-outline-danger" onclick="reviewsManager.deleteReview('${review.id}')">
-                        Elimina
+                        <i class="fas fa-trash"></i> Elimina
                     </button>
                 </div>
             </div>
@@ -292,6 +436,48 @@ class ReviewsManager {
                           this.escapeHtml(review.comment)
             };
         });
+    }
+
+    openEditModal(reviewId) {
+        const review = this.currentReviews[reviewId];
+        if (!review) {
+            console.error('Review not found:', reviewId);
+            return;
+        }
+        
+        this.editReview(reviewId, review);
+    }
+
+    async duplicateReview(reviewId) {
+        const review = this.currentReviews[reviewId];
+        if (!review) {
+            console.error('Review not found:', reviewId);
+            return;
+        }
+
+        if (!confirm('Vuoi duplicare questa recensione?')) {
+            return;
+        }
+
+        try {
+            // Create a copy of the review data without the ID
+            const duplicatedReview = {
+                clientName: review.clientName + ' (Copia)',
+                rating: review.rating,
+                comment: review.comment,
+                nationality: review.nationality,
+                service: review.service,
+                profileImage: review.profileImage,
+                visible: false, // Set as hidden by default for review
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await this.addReview(duplicatedReview);
+            this.showNotification('Recensione duplicata con successo!', 'success');
+        } catch (error) {
+            console.error('Error duplicating review:', error);
+            this.showNotification('Errore nel duplicare la recensione', 'error');
+        }
     }
 
     updateAdminUI() {
@@ -462,6 +648,35 @@ document.addEventListener('DOMContentLoaded', function() {
             };
             await reviewsManager.addReview(reviewData);
             e.target.reset();
+        });
+    }
+
+    // Admin reviews filters and search
+    const reviewsSearch = document.getElementById('reviews-search');
+    const reviewsFilter = document.getElementById('reviews-filter');
+    const reviewsSort = document.getElementById('reviews-sort');
+
+    if (reviewsSearch) {
+        reviewsSearch.addEventListener('input', () => {
+            if (reviewsManager && reviewsManager.filterAndDisplayReviews) {
+                reviewsManager.filterAndDisplayReviews();
+            }
+        });
+    }
+
+    if (reviewsFilter) {
+        reviewsFilter.addEventListener('change', () => {
+            if (reviewsManager && reviewsManager.filterAndDisplayReviews) {
+                reviewsManager.filterAndDisplayReviews();
+            }
+        });
+    }
+
+    if (reviewsSort) {
+        reviewsSort.addEventListener('change', () => {
+            if (reviewsManager && reviewsManager.filterAndDisplayReviews) {
+                reviewsManager.filterAndDisplayReviews();
+            }
         });
     }
 });
