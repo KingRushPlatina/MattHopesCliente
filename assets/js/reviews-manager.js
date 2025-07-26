@@ -243,6 +243,10 @@ class ReviewsManager {
         if (!reviewsContainer) return;
 
         const visibleReviews = reviews.filter(review => review.visible);
+        
+        // Update homepage statistics with calculated values
+        this.updateHomepageStats(visibleReviews, reviews);
+        
         if (visibleReviews.length === 0) {
             reviewsContainer.innerHTML = `
                 <div class="col-12 text-center">
@@ -305,6 +309,29 @@ class ReviewsManager {
             // Riduci
             commentElement.innerHTML = '"' + truncated + '"';
             buttonElement.innerHTML = '<i class="fas fa-eye me-1"></i>Vedi dettagli';
+        }
+    }
+
+    // Update homepage statistics with calculated values from reviews
+    updateHomepageStats(visibleReviews, allReviews) {
+        try {
+            // Calculate satisfaction percentage from average rating
+            if (visibleReviews.length > 0) {
+                const totalRating = visibleReviews.reduce((sum, review) => sum + parseFloat(review.rating || 0), 0);
+                const averageRating = totalRating / visibleReviews.length;
+                const satisfactionPercentage = Math.round((averageRating / 5) * 100);
+                
+                // Update satisfaction stat in homepage
+                const satisfactionElement = document.querySelector('#nightyeight .stat-value');
+                if (satisfactionElement) {
+                    satisfactionElement.textContent = satisfactionPercentage + '%';
+                }
+                
+                console.log(`📊 Updated satisfaction: ${satisfactionPercentage}% (avg rating: ${averageRating.toFixed(1)}/5 from ${visibleReviews.length} reviews)`);
+            }
+            
+        } catch (error) {
+            console.error('Error updating homepage stats:', error);
         }
     }
 

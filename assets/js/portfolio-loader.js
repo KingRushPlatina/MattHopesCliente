@@ -196,6 +196,19 @@ class PortfolioLoader {
         console.log(`Portfolio change detected for ${collection}`);
         await this.refreshPortfolioType(collection);
     }
+
+    // Getter methods for external access
+    get builds() {
+        return this.portfolioData.builds;
+    }
+    
+    get textures() {
+        return this.portfolioData.textures;
+    }
+    
+    get models() {
+        return this.portfolioData.models;
+    }
 }
 
 // Initialize portfolio loader when Firebase is ready
