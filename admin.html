@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Matt_Hopes</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main-style.css" />
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <style>
+        /* Theme variables */
+        :root {
+            --bg-color-light: #f8f9fa;
+            --bg-color-dark: #1a1a2e;
+            --text-color-light: #333;
+            --text-color-dark: #fff;
+            --card-bg-light: #fff;
+            --card-bg-dark: #2a2a3e;
+            --border-color-light: #dee2e6;
+            --border-color-dark: #444;
+            --input-bg-light: #fff;
+            --input-bg-dark: #3a3a4e;
+            --navbar-bg-light: #343a40;
+            --navbar-bg-dark: #1a1a2e;
+        }
+
+        body {
+            background-color: var(--bg-color-light);
+            color: var(--text-color-light);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        /* Page titles and headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--text-color-light);
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode h1, 
+        body.dark-mode h2, 
+        body.dark-mode h3, 
+        body.dark-mode h4, 
+        body.dark-mode h5, 
+        body.dark-mode h6 {
+            color: var(--text-color-dark);
+        }
+
+        /* Navbar theme support */
+        .navbar {
+            background-color: var(--navbar-bg-light) !important;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .navbar {
+            background-color: var(--navbar-bg-dark) !important;
+        }
+
+        /* Card theme support */
+        .card {
+            background-color: var(--card-bg-light);
+            border-color: var(--border-color-light);
+            color: var(--text-color-light);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .card {
+            background-color: var(--card-bg-dark);
+            border-color: var(--border-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.03);
+            border-color: var(--border-color-light);
+            color: var(--text-color-light);
+        }
+
+        body.dark-mode .card-header {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--border-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        /* Form elements theme support */
+        .form-control, .form-select {
+            background-color: var(--input-bg-light);
+            border-color: var(--border-color-light);
+            color: var(--text-color-light);
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .form-control,
+        body.dark-mode .form-select {
+            background-color: var(--input-bg-dark);
+            border-color: var(--border-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        .form-control::placeholder {
+            color: #6c757d;
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #aaa;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: var(--input-bg-light);
+            border-color: #8b5cf6;
+            color: var(--text-color-light);
+            box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+        }
+
+        body.dark-mode .form-control:focus,
+        body.dark-mode .form-select:focus {
+            background-color: var(--input-bg-dark);
+            border-color: #8b5cf6;
+            color: var(--text-color-dark);
+            box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+        }
+
+        /* Labels theme support */
+        .form-label {
+            color: var(--text-color-light);
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .form-label {
+            color: var(--text-color-dark);
+        }
+
+        /* Badge theme support */
+        .badge {
+            color: #fff !important;
+        }
+
+        body.dark-mode .badge {
+            color: #fff !important;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: rgba(139, 92, 246, 0.8);
+            border: none;
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(139, 92, 246, 1);
+            transform: scale(1.1);
+        }
+
+        /* Language toggle button */
+        .language-toggle {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(139, 92, 246, 0.8);
+            border: none;
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .language-toggle:hover {
+            background: rgba(139, 92, 246, 1);
+            transform: scale(1.05);
+        }
+
+        /* Admin review items theme support */
+        .admin-review-item {
+            background-color: var(--card-bg-light);
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            transition: all 0.3s ease;
+            color: var(--text-color-light);
+        }
+
+        body.dark-mode .admin-review-item {
+            background-color: var(--card-bg-dark);
+            border-color: var(--border-color-dark);
+            color: var(--text-color-dark);
+        }
+
+        .review-info {
+            flex: 1;
+        }
+
+        .review-info h6 {
+            color: var(--text-color-light);
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .review-info h6 {
+            color: var(--text-color-dark);
+        }
+
+        .review-info p {
+            color: var(--text-color-light);
+            margin-bottom: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .review-info p {
+            color: var(--text-color-dark);
+        }
+
+        .review-info small {
+            color: #6c757d;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .review-info small {
+            color: #adb5bd;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-direction: column;
+        }
+
+        .hidden-review {
+            opacity: 0.6;
+            border-left: 4px solid #ffc107;
+        }
+
+        body.dark-mode .hidden-review {
+            border-left-color: #ffc107;
+        }
+
+        /* Dropdown and select specific fixes */
+        select.form-control,
+        select.form-select {
+            color: var(--text-color-light);
+            background-color: var(--input-bg-light);
+        }
+
+        body.dark-mode select.form-control,
+        body.dark-mode select.form-select {
+            color: var(--text-color-dark);
+            background-color: var(--input-bg-dark);
+        }
+
+        /* Option elements */
+        select option {
+            background-color: var(--input-bg-light);
+            color: var(--text-color-light);
+        }
+
+        body.dark-mode select option {
+            background-color: var(--input-bg-dark);
+            color: var(--text-color-dark);
+        }
+
+        /* Text areas */
+        textarea.form-control {
+            color: var(--text-color-light);
+            background-color: var(--input-bg-light);
+        }
+
+        body.dark-mode textarea.form-control {
+            color: var(--text-color-dark);
+            background-color: var(--input-bg-dark);
+        }
+
+        /* Buttons in dark mode */
+        body.dark-mode .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        body.dark-mode .btn-warning {
+            background-color: #ffc107;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+        /* Upload styling */
+        .upload-progress {
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .image-preview img {
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        body.dark-mode .form-text {
+            color: #adb5bd;
+        }
+
+        /* File input styling */
+        input[type="file"].form-control {
+            padding: 8px 12px;
+        }
+
+        input[type="file"].form-control::-webkit-file-upload-button {
+            background: linear-gradient(135deg, #8b5cf6 0%, #667eea 100%);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            padding: 6px 12px;
+            margin-right: 10px;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        input[type="file"].form-control::-webkit-file-upload-button:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle Button -->
+    <button class="language-toggle" id="languageToggle">
+        <i class="fas fa-globe me-2"></i><span id="currentLang">EN</span>
+    </button>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img width="150px" src="assets/images/matt_hopes_title.png" alt="Matt_Hopes">
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span id="admin-user" class="navbar-text me-3"></span>
+                <button class="btn btn-outline-light btn-sm me-2" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-2"></i><span class="translatable" data-en="Logout" data-it="Esci">Logout</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="translatable" data-en="Admin Dashboard" data-it="Pannello Admin"><i class="fas fa-tachometer-alt me-2"></i>Admin Dashboard</h2>
+            <div id="connection-status" class="badge bg-success">
+                <i class="fas fa-check-circle me-1"></i><span class="translatable" data-en="Connected" data-it="Connesso">Connected</span>
+            </div>
+        </div>
+
+        <!-- Add New Review Card -->
+        <div class="card admin-card mb-4">
+            <div class="card-header">
+                <h5 class="translatable" data-en="Add New Review" data-it="Aggiungi Nuova Recensione"><i class="fas fa-plus-circle me-2"></i>Add New Review</h5>
+            </div>
+            <div class="card-body">
+                <form id="add-review-form">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="clientName" class="form-label">Client Name</label>
+                            <input type="text" class="form-control" name="clientName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="rating" class="form-label">Rating</label>
+                            <select class="form-control" name="rating" required>
+                                <option value="">Select Rating</option>
+                                <option value="5">5 Stars</option>
+                                <option value="4.5">4.5 Stars</option>
+                                <option value="4">4 Stars</option>
+                                <option value="3.5">3.5 Stars</option>
+                                <option value="3">3 Stars</option>
+                                <option value="2.5">2.5 Stars</option>
+                                <option value="2">2 Stars</option>
+                                <option value="1.5">1.5 Stars</option>
+                                <option value="1">1 Star</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nationality" class="form-label">🌐 Nationality</label>
+                            <select class="form-control" name="nationality" required>
+                                <option value="">Select Nationality</option>
+                                <option value="🇮🇹 Italy">🇮🇹 Italy</option>
+                                <option value="🇺🇸 USA">🇺🇸 USA</option>
+                                <option value="🇬🇧 UK">🇬🇧 UK</option>
+                                <option value="🇩🇪 Germany">🇩🇪 Germany</option>
+                                <option value="🇫🇷 France">🇫🇷 France</option>
+                                <option value="🇪🇸 Spain">🇪🇸 Spain</option>
+                                <option value="🇨🇦 Canada">🇨🇦 Canada</option>
+                                <option value="🇦🇺 Australia">🇦🇺 Australia</option>
+                                <option value="🇯🇵 Japan">🇯🇵 Japan</option>
+                                <option value="🇰🇷 South Korea">🇰🇷 South Korea</option>
+                                <option value="🇧🇷 Brazil">🇧🇷 Brazil</option>
+                                <option value="🇲🇽 Mexico">🇲🇽 Mexico</option>
+                                <option value="🇳🇱 Netherlands">🇳🇱 Netherlands</option>
+                                <option value="🇸🇪 Sweden">🇸🇪 Sweden</option>
+                                <option value="🇳🇴 Norway">🇳🇴 Norway</option>
+                                <option value="🇷🇺 Russia">🇷🇺 Russia</option>
+                                <option value="🇨🇳 China">🇨🇳 China</option>
+                                <option value="🇮🇳 India">🇮🇳 India</option>
+                                <option value="🌍 Other">🌍 Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="service" class="form-label">🛠️ Service Received</label>
+                            <input type="text" class="form-control" name="service" placeholder="e.g. 3D Modeling, Custom Architecture, Game Assets..." required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Review Comment</label>
+                        <textarea class="form-control" name="comment" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-purple">
+                        <i class="fas fa-plus me-2"></i>Add Review
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Manage Reviews Card -->
+        <div class="card admin-card mb-4">
+            <div class="card-header">
+                <h5><i class="fas fa-list me-2"></i>Manage Reviews</h5>
+            </div>
+            <div class="card-body">
+                <div id="admin-reviews-list">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading reviews...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Management Section -->
+        <div class="row">
+            <!-- Builds Management -->
+            <div class="col-md-4 mb-4">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="translatable" data-en="Manage Builds" data-it="Gestisci Costruzioni"><i class="fas fa-building me-2"></i>Manage Builds</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-purple btn-sm mb-3 w-100" data-bs-toggle="modal" data-bs-target="#addBuildModal">
+                            <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Build" data-it="Aggiungi Costruzione">Add Build</span>
+                        </button>
+                        <div id="builds-list" style="max-height: 300px; overflow-y: auto;">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Textures Management -->
+            <div class="col-md-4 mb-4">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="translatable" data-en="Manage Textures" data-it="Gestisci Texture"><i class="fas fa-palette me-2"></i>Manage Textures</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-purple btn-sm mb-3 w-100" data-bs-toggle="modal" data-bs-target="#addTextureModal">
+                            <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Texture" data-it="Aggiungi Texture">Add Texture</span>
+                        </button>
+                        <div id="textures-list" style="max-height: 300px; overflow-y: auto;">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Models Management -->
+            <div class="col-md-4 mb-4">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="translatable" data-en="Manage Models" data-it="Gestisci Modelli"><i class="fas fa-cube me-2"></i>Manage Models</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-purple btn-sm mb-3 w-100" data-bs-toggle="modal" data-bs-target="#addModelModal">
+                            <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Model" data-it="Aggiungi Modello">Add Model</span>
+                        </button>
+                        <div id="models-list" style="max-height: 300px; overflow-y: auto;">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modals for Adding Portfolio Items -->
+        <!-- Add Build Modal -->
+        <div class="modal fade" id="addBuildModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title translatable" data-en="Add New Build" data-it="Aggiungi Nuova Costruzione">Add New Build</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-build-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" name="title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Upload Image/GIF" data-it="Carica Immagine/GIF">Upload Image/GIF</label>
+                                    <input type="file" class="form-control" name="imageFile" accept="image/*,.gif" required>
+                                    <div class="form-text">Supported: JPG, PNG, GIF, WEBP (Max 10MB)</div>
+                                    <div class="mt-2">
+                                        <div class="upload-progress" style="display: none;">
+                                            <div class="progress">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted">Uploading...</small>
+                                        </div>
+                                        <div class="image-preview" style="display: none;">
+                                            <img src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" name="tags" placeholder="e.g. modern, architecture, luxury" required>
+                            </div>
+                            <button type="submit" class="btn btn-purple">
+                                <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Build" data-it="Aggiungi Costruzione">Add Build</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Texture Modal -->
+        <div class="modal fade" id="addTextureModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title translatable" data-en="Add New Texture" data-it="Aggiungi Nuova Texture">Add New Texture</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-texture-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" name="title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Upload Image/GIF" data-it="Carica Immagine/GIF">Upload Image/GIF</label>
+                                    <input type="file" class="form-control" name="imageFile" accept="image/*,.gif" required>
+                                    <div class="form-text">Supported: JPG, PNG, GIF, WEBP (Max 10MB)</div>
+                                    <div class="mt-2">
+                                        <div class="upload-progress" style="display: none;">
+                                            <div class="progress">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted">Uploading...</small>
+                                        </div>
+                                        <div class="image-preview" style="display: none;">
+                                            <img src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" name="tags" placeholder="e.g. metal, industrial, modern" required>
+                            </div>
+                            <button type="submit" class="btn btn-purple">
+                                <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Texture" data-it="Aggiungi Texture">Add Texture</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Model Modal -->
+        <div class="modal fade" id="addModelModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title translatable" data-en="Add New Model" data-it="Aggiungi Nuovo Modello">Add New Model</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-model-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" name="title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Upload Image/GIF" data-it="Carica Immagine/GIF">Upload Image/GIF</label>
+                                    <input type="file" class="form-control" name="imageFile" accept="image/*,.gif" required>
+                                    <div class="form-text">Supported: JPG, PNG, GIF, WEBP (Max 10MB)</div>
+                                    <div class="mt-2">
+                                        <div class="upload-progress" style="display: none;">
+                                            <div class="progress">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                            </div>
+                                            <small class="text-muted">Uploading...</small>
+                                        </div>
+                                        <div class="image-preview" style="display: none;">
+                                            <img src="" alt="Preview" class="img-thumbnail" style="max-width: 200px; max-height: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" name="tags" placeholder="e.g. characters, furniture, vehicles" required>
+                            </div>
+                            <button type="submit" class="btn btn-purple">
+                                <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Model" data-it="Aggiungi Modello">Add Model</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/reviews-manager.js"></script>
+    
+    <script>
+        // Language system (same as login.html)
+        let currentLanguage = localStorage.getItem('language') || 'en';
+        const languageToggle = document.getElementById('languageToggle');
+        const currentLangSpan = document.getElementById('currentLang');
+
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            currentLangSpan.textContent = lang.toUpperCase();
+
+            // Update all translatable elements
+            document.querySelectorAll('.translatable').forEach(element => {
+                const translation = element.getAttribute(`data-${lang}`);
+                if (translation) {
+                    if (element.innerHTML.includes('<i class=')) {
+                        // Keep icons and replace only text
+                        const iconMatch = element.innerHTML.match(/<i[^>]*><\/i>/);
+                        if (iconMatch) {
+                            element.innerHTML = iconMatch[0] + translation;
+                        } else {
+                            element.textContent = translation;
+                        }
+                    } else {
+                        element.textContent = translation;
+                    }
+                }
+            });
+        }
+
+        languageToggle.addEventListener('click', () => {
+            const newLang = currentLanguage === 'en' ? 'it' : 'en';
+            updateLanguage(newLang);
+        });
+
+        // Initialize language
+        updateLanguage(currentLanguage);
+
+        // Theme management - sync with main portfolio
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        // Check for saved theme preference and apply immediately
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            // Ensure light mode is properly set
+            body.classList.remove('dark-mode');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Logout function
+        function logout() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error('Logout error:', error);
+            });
+        }
+
+        // Portfolio Management Functions
+        class PortfolioManager {
+            constructor() {
+                this.initializePortfolioManagement();
+            }
+
+            initializePortfolioManagement() {
+                // Load existing portfolio items
+                this.loadBuilds();
+                this.loadTextures();
+                this.loadModels();
+
+                // Set up form event listeners
+                this.setupFormEventListeners();
+            }
+
+            setupFormEventListeners() {
+                // Builds form
+                document.getElementById('add-build-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addPortfolioItem('builds', new FormData(e.target), e.target);
+                });
+
+                // Textures form
+                document.getElementById('add-texture-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addPortfolioItem('textures', new FormData(e.target), e.target);
+                });
+
+                // Models form
+                document.getElementById('add-model-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.addPortfolioItem('models', new FormData(e.target), e.target);
+                });
+
+                // Set up file input change events for preview
+                this.setupFileInputs();
+            }
+
+            setupFileInputs() {
+                const fileInputs = document.querySelectorAll('input[type="file"][name="imageFile"]');
+                fileInputs.forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        this.previewImage(e.target);
+                    });
+                });
+            }
+
+            previewImage(fileInput) {
+                const file = fileInput.files[0];
+                if (file) {
+                    // Validate file size (10MB limit)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    // Validate file type
+                    if (!file.type.match(/^image\//)) {
+                        alert('Please select an image file');
+                        fileInput.value = '';
+                        return;
+                    }
+
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const preview = fileInput.closest('.modal-body').querySelector('.image-preview');
+                        const img = preview.querySelector('img');
+                        img.src = e.target.result;
+                        preview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+
+            async uploadImage(file, collection, fileName) {
+                try {
+                    const storage = firebase.storage();
+                    const storageRef = storage.ref();
+                    const imageRef = storageRef.child(`portfolio/${collection}/${fileName}`);
+                    
+                    const uploadTask = imageRef.put(file);
+                    
+                    return new Promise((resolve, reject) => {
+                        uploadTask.on('state_changed',
+                            (snapshot) => {
+                                // Progress function
+                                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                                // Update progress bar if needed
+                                console.log('Upload is ' + progress + '% done');
+                            },
+                            (error) => {
+                                // Error function
+                                reject(error);
+                            },
+                            async () => {
+                                // Complete function
+                                try {
+                                    const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                                    resolve(downloadURL);
+                                } catch (error) {
+                                    reject(error);
+                                }
+                            }
+                        );
+                    });
+                } catch (error) {
+                    throw error;
+                }
+            }
+
+            async addPortfolioItem(collection, formData, formElement) {
+                const submitBtn = formElement.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                
+                try {
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+                    const imageFile = formData.get('imageFile');
+                    let imageUrl = '';
+
+                    if (imageFile && imageFile.size > 0) {
+                        // Generate unique filename
+                        const fileName = `${Date.now()}_${imageFile.name}`;
+                        
+                        // Upload image to Firebase Storage
+                        imageUrl = await this.uploadImage(imageFile, collection, fileName);
+                    } else {
+                        throw new Error('Please select an image file');
+                    }
+
+                    const data = {
+                        title: formData.get('title'),
+                        image: imageUrl,
+                        description: formData.get('description'),
+                        tags: formData.get('tags').split(',').map(tag => tag.trim()),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        id: 'item_' + Date.now()
+                    };
+
+                    await firebase.firestore().collection(collection).add(data);
+                    
+                    // Show success message
+                    alert(`${collection.slice(0, -1)} added successfully!`);
+                    
+                    // Reset form and close modal
+                    formElement.reset();
+                    
+                    // Hide image preview
+                    const preview = formElement.querySelector('.image-preview');
+                    if (preview) preview.style.display = 'none';
+                    
+                    // Close modal
+                    const modalId = formElement.closest('.modal').id;
+                    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+                    
+                    // Reload the list
+                    this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
+
+                } catch (error) {
+                    console.error(`Error adding ${collection}:`, error);
+                    alert(`Error adding ${collection.slice(0, -1)}: ${error.message || 'Please try again.'}`);
+                } finally {
+                    // Reset button
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+
+            async loadBuilds() {
+                try {
+                    const snapshot = await firebase.firestore().collection('builds').orderBy('createdAt', 'desc').get();
+                    const builds = [];
+                    snapshot.forEach(doc => {
+                        builds.push({ id: doc.id, ...doc.data() });
+                    });
+                    this.displayPortfolioItems('builds', builds);
+                } catch (error) {
+                    console.error('Error loading builds:', error);
+                    document.getElementById('builds-list').innerHTML = '<p class="text-danger">Error loading builds</p>';
+                }
+            }
+
+            async loadTextures() {
+                try {
+                    const snapshot = await firebase.firestore().collection('textures').orderBy('createdAt', 'desc').get();
+                    const textures = [];
+                    snapshot.forEach(doc => {
+                        textures.push({ id: doc.id, ...doc.data() });
+                    });
+                    this.displayPortfolioItems('textures', textures);
+                } catch (error) {
+                    console.error('Error loading textures:', error);
+                    document.getElementById('textures-list').innerHTML = '<p class="text-danger">Error loading textures</p>';
+                }
+            }
+
+            async loadModels() {
+                try {
+                    const snapshot = await firebase.firestore().collection('models').orderBy('createdAt', 'desc').get();
+                    const models = [];
+                    snapshot.forEach(doc => {
+                        models.push({ id: doc.id, ...doc.data() });
+                    });
+                    this.displayPortfolioItems('models', models);
+                } catch (error) {
+                    console.error('Error loading models:', error);
+                    document.getElementById('models-list').innerHTML = '<p class="text-danger">Error loading models</p>';
+                }
+            }
+
+            displayPortfolioItems(collection, items) {
+                const container = document.getElementById(`${collection}-list`);
+                
+                if (items.length === 0) {
+                    container.innerHTML = `<p class="text-muted">No ${collection} found</p>`;
+                    return;
+                }
+
+                const html = items.map(item => `
+                    <div class="admin-portfolio-item border rounded p-2 mb-2" data-id="${item.id}">
+                        <div class="d-flex align-items-center">
+                            <img src="${item.image}" alt="${item.title}" class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${item.title}</h6>
+                                <small class="text-muted">${item.tags.join(', ')}</small>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-warning btn-sm" onclick="portfolioManager.editItem('${collection}', '${item.id}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="portfolioManager.deleteItem('${collection}', '${item.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                container.innerHTML = html;
+            }
+
+            async deleteItem(collection, itemId) {
+                if (confirm(`Are you sure you want to delete this ${collection.slice(0, -1)}?`)) {
+                    try {
+                        await firebase.firestore().collection(collection).doc(itemId).delete();
+                        alert(`${collection.slice(0, -1)} deleted successfully!`);
+                        
+                        // Reload the list
+                        this[`load${collection.charAt(0).toUpperCase() + collection.slice(1)}`]();
+                    } catch (error) {
+                        console.error(`Error deleting ${collection}:`, error);
+                        alert(`Error deleting ${collection.slice(0, -1)}. Please try again.`);
+                    }
+                }
+            }
+
+            async editItem(collection, itemId) {
+                // For now, just show an alert. You can implement edit functionality later
+                alert('Edit functionality coming soon!');
+            }
+        }
+
+        // Initialize portfolio manager after authentication
+        let portfolioManager;
+        
+        // Add this to the authentication check
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                // User is signed in
+                document.getElementById('admin-user').textContent = `Welcome, ${user.email}`;
+                
+                // Initialize reviews manager for admin
+                if (typeof ReviewsManager !== 'undefined') {
+                    window.reviewsManager = new ReviewsManager();
+                    // Set the current user manually for admin page
+                    setTimeout(() => {
+                        if (reviewsManager) {
+                            reviewsManager.currentUser = user;
+                        }
+                    }, 1000);
+                }
+
+                // Initialize portfolio manager
+                portfolioManager = new PortfolioManager();
+            } else {
+                // User is not signed in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

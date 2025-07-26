@@ -348,9 +348,67 @@ function initAnimations() {
     });
 }
 
+// Language system
+function initializeLanguage() {
+    const currentLanguage = localStorage.getItem('language') || 'en';
+    const languageOptions = document.querySelectorAll('.language-option');
+    const currentLanguageSpan = document.getElementById('currentLanguage');
+    
+    // Language names mapping
+    const languageNames = {
+        en: 'English',
+        it: 'Italiano'
+    };
+
+    // Set initial language
+    updateLanguage(currentLanguage);
+    
+    // Add event listeners to language options
+    languageOptions.forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            const lang = this.getAttribute('data-lang');
+            updateLanguage(lang);
+            localStorage.setItem('language', lang);
+        });
+    });
+
+    function updateLanguage(lang) {
+        // Update dropdown button text
+        if (currentLanguageSpan) {
+            currentLanguageSpan.textContent = languageNames[lang];
+        }
+
+        // Update all translatable elements
+        document.querySelectorAll('.translatable').forEach(element => {
+            const translation = element.getAttribute(`data-${lang}`);
+            if (translation) {
+                element.textContent = translation;
+            }
+        });
+
+        // Update placeholders
+        document.querySelectorAll(`[data-${lang}-placeholder]`).forEach(input => {
+            const placeholder = input.getAttribute(`data-${lang}-placeholder`);
+            if (placeholder) {
+                input.placeholder = placeholder;
+            }
+        });
+
+        // Update active state in dropdown
+        languageOptions.forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.getAttribute('data-lang') === lang) {
+                opt.classList.add('active');
+            }
+        });
+    }
+}
+
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initializeFilters();
+    initializeLanguage();
     
     // Add scroll effect to navbar
     window.addEventListener('scroll', function() {

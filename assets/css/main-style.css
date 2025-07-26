@@ -1161,3 +1161,226 @@ body.light-mode {
     color: #111111 !important;
     background-color: #F4F4F4 !important;
 }
+
+/* Admin Section Styles */
+.admin-section {
+    border-top: 2px solid var(--accent-purple);
+    padding-top: 2rem;
+    margin-top: 2rem;
+}
+
+.admin-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+}
+
+.light-mode .admin-card {
+    background: var(--light-card);
+    border-color: #dee2e6;
+}
+
+.admin-card .card-header {
+    background: rgba(129, 50, 205, 0.1);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 12px 12px 0 0;
+}
+
+.light-mode .admin-card .card-header {
+    background: rgba(129, 50, 205, 0.05);
+    border-bottom-color: #dee2e6;
+}
+
+.admin-review-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid var(--accent-purple);
+}
+
+.light-mode .admin-review-item {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.admin-review-item.hidden-review {
+    opacity: 0.6;
+    border-left-color: #666;
+}
+
+.admin-review-item .review-info {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.admin-review-item .review-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Dynamic Review Cards */
+.review-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 2rem;
+    height: 100%;
+    backdrop-filter: blur(10px);
+    transition: all var(--transition-speed) ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.light-mode .review-card {
+    background: var(--light-card);
+    border-color: #dee2e6;
+}
+
+.review-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-hover));
+}
+
+.review-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(129, 50, 205, 0.2);
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.review-name {
+    color: var(--accent-purple);
+    font-weight: 600;
+    margin: 0;
+}
+
+.light-mode .review-name {
+    color: var(--accent-purple);
+}
+
+.review-rating {
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.review-comment {
+    font-style: italic;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    color: var(--text-secondary);
+}
+
+.light-mode .review-comment {
+    color: var(--light-text);
+}
+
+.review-date {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.light-mode .review-date {
+    color: #6c757d;
+}
+
+/* Review Tags */
+.review-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.review-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 15px;
+    background: rgba(129, 50, 205, 0.1);
+    color: var(--accent-purple);
+    border: 1px solid rgba(129, 50, 205, 0.3);
+    transition: all 0.3s ease;
+}
+
+.light-mode .review-tag {
+    background: rgba(129, 50, 205, 0.05);
+    color: var(--accent-purple);
+}
+
+.review-tag:hover {
+    background: rgba(129, 50, 205, 0.2);
+    transform: translateY(-1px);
+}
+
+.nationality-tag {
+    background: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+    border-color: rgba(52, 152, 219, 0.3);
+}
+
+.light-mode .nationality-tag {
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.service-tag {
+    background: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+    border-color: rgba(46, 204, 113, 0.3);
+}
+
+.light-mode .service-tag {
+    background: rgba(46, 204, 113, 0.05);
+}
+
+/* Form Styles */
+.form-control, .form-select {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    border-radius: 8px;
+}
+
+.light-mode .form-control,
+.light-mode .form-select {
+    background: #fff;
+    border-color: #ced4da;
+    color: var(--light-text);
+}
+
+.form-control:focus,
+.form-select:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent-purple);
+    box-shadow: 0 0 0 0.2rem rgba(129, 50, 205, 0.25);
+    color: var(--text-primary);
+}
+
+.light-mode .form-control:focus,
+.light-mode .form-select:focus {
+    background: #fff;
+    color: var(--light-text);
+}
+
+.form-label {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.light-mode .form-label {
+    color: var(--light-text);
+}

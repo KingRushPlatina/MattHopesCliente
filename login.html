@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Matt_Hopes</title>
+    <link rel="icon" href="assets/images/favicon.ico" type="image/x-icon" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/main-style.css" />
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-gradient-light: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-gradient-dark: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            --container-bg-light: rgba(255, 255, 255, 0.95);
+            --container-bg-dark: rgba(26, 26, 46, 0.95);
+            --text-color-light: #333;
+            --text-color-dark: #fff;
+            --subtitle-color-light: #666;
+            --subtitle-color-dark: #ccc;
+            --input-border-light: #e1e5e9;
+            --input-border-dark: #444;
+            --input-bg-light: #fff;
+            --input-bg-dark: #2a2a3e;
+            --input-text-light: #333;
+            --input-text-dark: #fff;
+        }
+
+        body {
+            background: var(--bg-gradient-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: var(--bg-gradient-dark);
+        }
+        
+        .login-container {
+            background: var(--container-bg-light);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .login-container {
+            background: var(--container-bg-dark);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-logo {
+            width: 200px;
+            margin-bottom: 2rem;
+        }
+        
+        .login-title {
+            color: var(--text-color-light);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .login-title {
+            color: var(--text-color-dark);
+        }
+        
+        .login-subtitle {
+            color: var(--subtitle-color-light);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        body.dark-mode .login-subtitle {
+            color: var(--subtitle-color-dark);
+        }
+        
+        .form-control {
+            border: 2px solid var(--input-border-light);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            background: var(--input-bg-light);
+            color: var(--input-text-light);
+        }
+
+        body.dark-mode .form-control {
+            border-color: var(--input-border-dark);
+            background: var(--input-bg-dark);
+            color: var(--input-text-dark);
+        }
+
+        body.dark-mode .form-control::placeholder {
+            color: #aaa;
+        }
+        
+        .form-control:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+        }
+        
+        .btn-login {
+            background: linear-gradient(135deg, #8b5cf6 0%, #667eea 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            color: white;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+            color: white;
+        }
+        
+        .btn-login:disabled {
+            opacity: 0.6;
+            transform: none;
+        }
+        
+        .back-link {
+            color: #8b5cf6;
+            text-decoration: none;
+            margin-top: 1rem;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .back-link:hover {
+            color: #667eea;
+            text-decoration: underline;
+        }
+
+        /* Theme toggle button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        /* Language toggle button */
+        .language-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Language Toggle Button -->
+    <button class="language-toggle" id="languageToggle">
+        <i class="fas fa-globe me-2"></i><span id="currentLang">EN</span>
+    </button>
+
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="login-container">
+        <img src="assets/images/matt_hopes_title.png" alt="Matt_Hopes" class="login-logo">
+        
+        <h2 class="login-title" data-en="Admin Login" data-it="Login Admin">
+            <i class="fas fa-user-shield me-2"></i><span class="translatable">Admin Login</span>
+        </h2>
+        <p class="login-subtitle translatable" data-en="Secure access to admin dashboard" data-it="Accesso sicuro al pannello admin">Secure access to admin dashboard</p>
+        
+        <form id="admin-login-form">
+            <div class="mb-3">
+                <input type="email" class="form-control" id="admin-email" data-en-placeholder="Enter your email" data-it-placeholder="Inserisci la tua email" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" id="admin-password" data-en-placeholder="Enter your password" data-it-placeholder="Inserisci la tua password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-login" id="login-btn">
+                <i class="fas fa-sign-in-alt me-2"></i><span class="translatable" data-en="Access Dashboard" data-it="Accedi al Pannello">Access Dashboard</span>
+            </button>
+        </form>
+        
+        <div id="login-status" class="mt-3"></div>
+        
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-left me-2"></i><span class="translatable" data-en="Back to Portfolio" data-it="Torna al Portfolio">Back to Portfolio</span>
+        </a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    
+    <script>
+        // Language system
+        const languages = {
+            en: {
+                loading: 'Logging in...',
+                success: 'Login successful! Redirecting...',
+                errors: {
+                    default: 'Login failed. Please try again.',
+                    config: 'Configuration error. Please contact administrator.',
+                    'auth/user-not-found': 'No account found with this email.',
+                    'auth/wrong-password': 'Incorrect password.',
+                    'auth/invalid-email': 'Invalid email address.',
+                    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+                    'auth/network-request-failed': 'Network error. Please check your connection.'
+                }
+            },
+            it: {
+                loading: 'Accesso in corso...',
+                success: 'Login riuscito! Reindirizzamento...',
+                errors: {
+                    default: 'Login fallito. Riprova.',
+                    config: 'Errore di configurazione. Contatta l\'amministratore.',
+                    'auth/user-not-found': 'Nessun account trovato con questa email.',
+                    'auth/wrong-password': 'Password errata.',
+                    'auth/invalid-email': 'Indirizzo email non valido.',
+                    'auth/too-many-requests': 'Troppi tentativi falliti. Riprova più tardi.',
+                    'auth/network-request-failed': 'Errore di rete. Controlla la connessione.'
+                }
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('language') || 'en';
+
+        // Language management
+        const languageToggle = document.getElementById('languageToggle');
+        const currentLangSpan = document.getElementById('currentLang');
+
+        function updateLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('language', lang);
+            currentLangSpan.textContent = lang.toUpperCase();
+
+            // Update all translatable elements
+            document.querySelectorAll('.translatable').forEach(element => {
+                const translation = element.getAttribute(`data-${lang}`);
+                if (translation) {
+                    element.textContent = translation;
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll(`input[data-${lang}-placeholder]`).forEach(input => {
+                const placeholder = input.getAttribute(`data-${lang}-placeholder`);
+                if (placeholder) {
+                    input.placeholder = placeholder;
+                }
+            });
+        }
+
+        languageToggle.addEventListener('click', () => {
+            const newLang = currentLanguage === 'en' ? 'it' : 'en';
+            updateLanguage(newLang);
+        });
+
+        // Initialize language on page load
+        updateLanguage(currentLanguage);
+
+        // Theme management - sync with main portfolio
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            // Ensure light mode is properly set
+            body.classList.remove('dark-mode');
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Wait for Firebase to be initialized
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is already logged in
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    // User is already signed in, redirect to admin
+                    window.location.href = 'admin.html';
+                }
+            });
+        });
+
+        // Login functionality
+        document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const statusDiv = document.getElementById('login-status');
+            
+            // Show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>${languages[currentLanguage].loading}`;
+            statusDiv.innerHTML = '';
+            
+            try {
+                // Make sure Firebase is initialized
+                if (!firebase.apps.length) {
+                    throw new Error('Firebase not initialized. Please check firebase-config.js');
+                }
+
+                // Sign in with Firebase Auth
+                const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+                
+                // Success
+                statusDiv.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>${languages[currentLanguage].success}</div>`;
+                
+                // Redirect to admin dashboard
+                setTimeout(() => {
+                    window.location.href = 'admin.html';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Login error:', error);
+                let errorMessage = languages[currentLanguage].errors.default;
+                
+                if (error.message.includes('Firebase not initialized')) {
+                    errorMessage = languages[currentLanguage].errors.config;
+                } else if (languages[currentLanguage].errors[error.code]) {
+                    errorMessage = languages[currentLanguage].errors[error.code];
+                }
+                
+                statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${errorMessage}</div>`;
+                
+                // Reset button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = `<i class="fas fa-sign-in-alt me-2"></i>${document.querySelector('#login-btn .translatable').textContent}`;
+            }
+        });
+    </script>
+</body>
+</html>

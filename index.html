@@ -10,6 +10,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
     <link rel="stylesheet" href="assets/css/main-style.css" />
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 </head>
 <body>
@@ -35,29 +41,33 @@
             <ul class="navbar-nav me-auto">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="portfolioDropdown" role="button" data-bs-toggle="dropdown">
-                        Portfolio
+                        <span class="translatable" data-en="Portfolio" data-it="Portfolio">Portfolio</span>
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#" onclick="showPage('builds')">Builds</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="showPage('textures')">Textures</a></li>
-                        <li><a class="dropdown-item" href="#" onclick="showPage('models')">Models</a></li>
+                        <li><a class="dropdown-item translatable" href="#" onclick="showPage('builds')" data-en="Builds" data-it="Costruzioni">Builds</a></li>
+                        <li><a class="dropdown-item translatable" href="#" onclick="showPage('textures')" data-en="Textures" data-it="Texture">Textures</a></li>
+                        <li><a class="dropdown-item translatable" href="#" onclick="showPage('models')" data-en="Models" data-it="Modelli">Models</a></li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="showPage('reviews')">Reviews</a>
+                    <a class="nav-link translatable" href="#" onclick="showPage('reviews')" data-en="Reviews" data-it="Recensioni">Reviews</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="showPage('contact')">Contacts</a>
+                    <a class="nav-link translatable" href="#" onclick="showPage('contact')" data-en="Contacts" data-it="Contatti">Contacts</a>
                 </li>
             </ul>
             <div class="d-flex align-items-center">
                 <div class="dropdown me-3">
-                    <button class="btn btn-purple dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-globe"></i> English
+                    <button class="btn btn-purple dropdown-toggle" type="button" data-bs-toggle="dropdown" id="languageDropdown">
+                        <i class="fas fa-globe"></i> <span id="currentLanguage">English</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">English</a></li>
-                        <li><a class="dropdown-item" href="#">Coming Soon...</a></li>
+                        <li><a class="dropdown-item language-option" href="#" data-lang="en">
+                            <i class="fas fa-flag me-2"></i>English
+                        </a></li>
+                        <li><a class="dropdown-item language-option" href="#" data-lang="it">
+                            <i class="fas fa-flag me-2"></i>Italiano
+                        </a></li>
                     </ul>
                 </div>
                 <button class="theme-toggle" id="themeToggle">
@@ -78,15 +88,15 @@
         <div class="hero-content">
             <!-- <h1 class="hero-title"></h1> -->
             <img class="matt_hopes_title" src="assets/images/hehetrh.png" alt="matt_hopes_title">
-            <p class="hero-subtitle">Transforming ideas into immersive experiences through stunning builds, detailed textures, and professional models</p>
+            <p class="hero-subtitle translatable" data-en="Transforming ideas into immersive experiences through stunning builds, detailed textures, and professional models" data-it="Trasformo idee in esperienze immersive attraverso costruzioni spettacolari, texture dettagliate e modelli professionali">Transforming ideas into immersive experiences through stunning builds, detailed textures, and professional models</p>
             <div class="dropdown">
-                <button class="btn btn-purple btn-lg dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-purple btn-lg dropdown-toggle translatable" type="button" data-bs-toggle="dropdown" data-en="Explore Portfolio" data-it="Esplora Portfolio">
                     Explore Portfolio
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#" onclick="showPage('builds')">Builds</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="showPage('textures')">Textures</a></li>
-                    <li><a class="dropdown-item" href="#" onclick="showPage('models')">Models</a></li>
+                    <li><a class="dropdown-item translatable" href="#" onclick="showPage('builds')" data-en="Builds" data-it="Costruzioni">Builds</a></li>
+                    <li><a class="dropdown-item translatable" href="#" onclick="showPage('textures')" data-en="Textures" data-it="Texture">Textures</a></li>
+                    <li><a class="dropdown-item translatable" href="#" onclick="showPage('models')" data-en="Models" data-it="Modelli">Models</a></li>
                 </ul>
             </div>
             <div class="hero-stats">
@@ -158,61 +168,10 @@
                 </div>
             </div>
             <div class="portfolio-grid" id="buildsGrid">
-                <!-- Build items -->
-                <div class="portfolio-item" data-tags="modern architecture" onclick="openModal('build1')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Modern House">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Modern Glass House</h5>
-                        <p>A sleek contemporary design featuring clean lines and panoramic windows with sustainable materials.</p>
-                        <div>
-                            <span class="tag tag-blue">Modern</span>
-                            <span class="tag tag-green">Architecture</span>
-                            <span class="tag tag-red">Luxury</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="medieval fantasy" onclick="openModal('build2')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Medieval Castle">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Medieval Fortress</h5>
-                        <p>An imposing castle with detailed stonework, defensive structures, and authentic medieval architecture.</p>
-                        <div>
-                            <span class="tag tag-aqua-green">Medieval</span>
-                            <span class="tag tag-magenta">Fantasy</span>
-                            <span class="tag tag-light-blue">Historical</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="fantasy architecture" onclick="openModal('build3')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fantasy Tower">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Enchanted Tower</h5>
-                        <p>A mystical tower with intricate magical details, floating elements, and ethereal lighting effects.</p>
-                        <div>
-                            <span class="tag tag-yellow">Fantasy</span>
-                            <span class="tag tag-orange">Architecture</span>
-                            <span class="tag tag-brown">Magical</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="landscape modern" onclick="openModal('build4')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Landscape Design">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Modern Landscape</h5>
-                        <p>Contemporary landscape design with geometric patterns, water features, and sustainable planting.</p>
-                        <div>
-                            <span class="tag tag-gray">Landscape</span>
-                            <span class="tag tag-white">Modern</span>
-                            <span class="tag tag-black">Sustainable</span>
-                        </div>
+                <!-- Build items will be loaded dynamically -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading builds...</span>
                     </div>
                 </div>
             </div>
@@ -237,61 +196,10 @@
                 </div>
             </div>
             <div class="portfolio-grid" id="texturesGrid">
-                <!-- Texture items -->
-                <div class="portfolio-item" data-tags="stone" onclick="openModal('texture1')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Stone Texture">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Ancient Stone Wall</h5>
-                        <p>Weathered stone texture with realistic wear patterns, moss details, and authentic aging.</p>
-                        <div>
-                            <span class="tag tag-black">Stone</span>
-                            <span class="tag tag-white">Weathered</span>
-                            <span class="tag tag-gray">Natural</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="wood" onclick="openModal('texture2')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1599696848652-f0ff23bc911f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Wood Texture">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Oak Wood Planks</h5>
-                        <p>Rich oak wood texture with natural grain patterns, knots, and realistic lighting effects.</p>
-                        <div>
-                            <span class="tag tag-brown">Wood</span>
-                            <span class="tag tag-orange">Oak</span>
-                            <span class="tag tag-yellow">Natural</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="metal" onclick="openModal('texture3')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Metal Texture">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Brushed Steel</h5>
-                        <p>Industrial brushed steel texture with authentic surface reflections and subtle scratches.</p>
-                        <div>
-                            <span class="tag tag-light-blue">Metal</span>
-                            <span class="tag tag-magenta">Industrial</span>
-                            <span class="tag tag-aqua-green">Modern</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="nature fabric" onclick="openModal('texture4')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1578587018452-892bacefd3f2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fabric Texture">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Linen Fabric</h5>
-                        <p>Natural linen texture with realistic folds, lighting, and subtle imperfections.</p>
-                        <div>
-                            <span class="tag tag-red">Fabric</span>
-                            <span class="tag tag-green">Natural</span>
-                            <span class="tag tag-blue">Linen</span>
-                        </div>
+                <!-- Texture items will be loaded dynamically -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading textures...</span>
                     </div>
                 </div>
             </div>
@@ -315,61 +223,10 @@
                 </div>
             </div>
             <div class="portfolio-grid" id="modelsGrid">
-                <!-- Model items -->
-                <div class="portfolio-item" data-tags="furniture" onclick="openModal('model1')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1503602642458-232111445657?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Chair Model">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Modern Office Chair</h5>
-                        <p>Ergonomic office chair with detailed materials, realistic proportions, and adjustable features.</p>
-                        <div>
-                            <span class="tag tag-blue">Furniture</span>
-                            <span class="tag tag-green">Modern</span>
-                            <span class="tag tag-red">Ergonomic</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="vehicles" onclick="openModal('model2')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Car Model">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Sports Car</h5>
-                        <p>High-detail sports car model with accurate geometry, detailed interior, and realistic materials.</p>
-                        <div>
-                            <span class="tag tag-aqua-green">Vehicles</span>
-                            <span class="tag tag-magenta">Sports</span>
-                            <span class="tag tag-light-blue">Detailed</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="props" onclick="openModal('model3')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1589985270826-4b7bb135bc9d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sword Model">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Medieval Sword</h5>
-                        <p>Intricately designed medieval sword with ornate handle, sharp blade, and historical accuracy.</p>
-                        <div>
-                            <span class="tag tag-yellow">Props</span>
-                            <span class="tag tag-orange">Medieval</span>
-                            <span class="tag tag-brown">Weapon</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="portfolio-item" data-tags="characters" onclick="openModal('model4')">
-                    <div class="portfolio-img-container">
-                        <img src="https://images.unsplash.com/photo-1547891654-e66ed7ebb968?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Character Model">
-                    </div>
-                    <div class="portfolio-item-content">
-                        <h5>Fantasy Warrior</h5>
-                        <p>Highly detailed fantasy warrior character with custom armor, weapons, and realistic textures.</p>
-                        <div>
-                            <span class="tag tag-gray">Characters</span>
-                            <span class="tag tag-white">Fantasy</span>
-                            <span class="tag tag-black">Detailed</span>
-                        </div>
+                <!-- Model items will be loaded dynamically -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading models...</span>
                     </div>
                 </div>
             </div>
@@ -380,87 +237,19 @@
     <section id="reviews" class="page-section portfolio-section">
         <div class="container">
             <h2 class="section-title">Client Reviews</h2>
-            <div class="row">
-                <div class="col-lg-6 mb-4">
-                    <div class="review-card" onclick="openModal('review1')">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="John Doe" class="review-image me-3">
-                            <div>
-                                <h4>John Doe</h4>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mb-4">"Absolutely incredible work! The attention to detail in my custom build was phenomenal. Matt delivered exactly what I envisioned and more. The communication throughout the project was exceptional, and he exceeded all my expectations."</p>
-                        <small class="">Commission: Modern Villa Build</small>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                    <div class="review-card" onclick="openModal('review2')">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Miller" class="review-image me-3">
-                            <div>
-                                <h4>Sarah Miller</h4>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mb-4">"The texture pack Matt created for our game project was outstanding. Professional quality and delivered ahead of schedule. Highly recommended! The textures added incredible depth and realism to our environments."</p>
-                        <small class="">Commission: Custom Texture Pack</small>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                    <div class="review-card" onclick="openModal('review3')">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="https://randomuser.me/api/portraits/men/62.jpg" alt="Robert Johnson" class="review-image me-3">
-                            <div>
-                                <h4>Robert Johnson</h4>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mb-4">"Amazing 3D models! Every piece was crafted with precision and creativity. Matt's work exceeded all expectations. The models integrated perfectly into our project and received praise from the entire team."</p>
-                        <small class="">Commission: Furniture Model Set</small>
-                    </div>
-                </div>
-                <div class="col-lg-6 mb-4">
-                    <div class="review-card" onclick="openModal('review4')">
-                        <div class="d-flex align-items-center mb-4">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Anna Lee" class="review-image me-3">
-                            <div>
-                                <h4>Anna Lee</h4>
-                                <div class="review-rating">
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                    <i class="fas fa-star"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <p class="mb-4">"Fantastic medieval castle build! The level of detail and historical accuracy was impressive. Great communication throughout. The castle became the centerpiece of our game world and received rave reviews."</p>
-                        <small class="">Commission: Medieval Castle</small>
+            
+            <!-- Public Reviews Display -->
+            <div class="row" id="reviews-container">
+                <!-- Reviews will be loaded here dynamically -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading reviews...</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- Contact Page -->
     <section id="contact" class="page-section contact-section">
         <div class="contact-pattern"></div>
@@ -478,28 +267,21 @@
                     <div class="contact-item">
                         <i class="fab fa-discord contact-icon"></i>
                         <h5>Discord</h5>
-                        <p>Matt_Hopes#1234</p>
+                        <p><a href="https://dsc.gg/matt-hopes" target="_blank" style="color: inherit; text-decoration: none;">dsc.gg/matt-hopes</a></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <div class="contact-item">
-                        <i class="fab fa-twitter contact-icon"></i>
-                        <h5>Twitter</h5>
-                        <p>@Matt_Hopes</p>
+                        <i class="fas fa-handshake contact-icon"></i>
+                        <h5>Fiverr</h5>
+                        <p><a href="https://it.fiverr.com/matthopes" target="_blank" style="color: inherit; text-decoration: none;">matthopes</a></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
                     <div class="contact-item">
-                        <i class="fab fa-instagram contact-icon"></i>
-                        <h5>Instagram</h5>
-                        <p>@matt_hopes_art</p>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="contact-item">
-                        <i class="fab fa-artstation contact-icon"></i>
-                        <h5>ArtStation</h5>
-                        <p>Matt_Hopes</p>
+                        <i class="fab fa-behance contact-icon"></i>
+                        <h5>Behance</h5>
+                        <p><a href="https://www.behance.net/MattHopes" target="_blank" style="color: inherit; text-decoration: none;">MattHopes</a></p>
                     </div>
                 </div>
                 <div class="col-md-6 col-lg-4">
@@ -557,10 +339,10 @@
                 <a href="#" class="footer-link" onclick="showPage('contact')">Contact</a>
             </div>
             <div class="social-icons">
-                <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                <a href="https://dsc.gg/matt-hopes" target="_blank" class="social-icon"><i class="fab fa-discord"></i></a>
+                <a href="https://it.fiverr.com/matthopes" target="_blank" class="social-icon"><i class="fas fa-handshake"></i></a>
+                <a href="https://www.behance.net/MattHopes" target="_blank" class="social-icon"><i class="fab fa-behance"></i></a>
                 <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-discord"></i></a>
-                <a href="#" class="social-icon"><i class="fab fa-artstation"></i></a>
                 <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
             </div>
             <p>&copy; 2025 Matt_Hopes. All rights reserved.</p>
@@ -576,5 +358,8 @@
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/reviews-manager.js"></script>
+    <script src="assets/js/portfolio-loader.js"></script>
 </body>
 </html>
