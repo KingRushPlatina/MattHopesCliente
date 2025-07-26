@@ -451,7 +451,7 @@ function initAnimations() {
     });
 }
 
-// Language system
+// Automatic Translation System
 function initializeLanguage() {
     const currentLanguage = localStorage.getItem('language') || 'en';
     const languageOptions = document.querySelectorAll('.language-option');
@@ -461,6 +461,93 @@ function initializeLanguage() {
     const languageNames = {
         en: 'English',
         it: 'Italiano'
+    };
+
+    // Translation dictionary for automatic translation
+    const translations = {
+        // Navigation and main sections
+        'Portfolio': { it: 'Portfolio' },
+        'Builds': { it: 'Costruzioni' },
+        'Textures': { it: 'Texture' },
+        'Models': { it: 'Modelli' },
+        'Reviews': { it: 'Recensioni' },
+        'Contacts': { it: 'Contatti' },
+        'Contact': { it: 'Contatto' },
+        'Home': { it: 'Casa' },
+        
+        // Services section
+        'My Services': { it: 'I Miei Servizi' },
+        '3D Modeling': { it: 'Modellazione 3D' },
+        'Texture Creation': { it: 'Creazione Texture' },
+        'Environment Design': { it: 'Design Ambientale' },
+        'Professional 3D modeling services for characters, props, and environments with high-quality textures and optimized topology.': {
+            it: 'Servizi professionali di modellazione 3D per personaggi, oggetti e ambienti con texture di alta qualità e topologia ottimizzata.'
+        },
+        'Custom PBR textures and material creation for any surface with realistic details and seamless tiling.': {
+            it: 'Texture PBR personalizzate e creazione di materiali per qualsiasi superficie con dettagli realistici e ripetizione perfetta.'
+        },
+        'Complete environment builds for games and virtual worlds with optimized assets and lighting setups.': {
+            it: 'Costruzioni complete di ambienti per giochi e mondi virtuali con asset ottimizzati e configurazioni di illuminazione.'
+        },
+        
+        // Portfolio sections
+        'Builds Portfolio': { it: 'Portfolio Costruzioni' },
+        'Textures Portfolio': { it: 'Portfolio Texture' },
+        'Models Portfolio': { it: 'Portfolio Modelli' },
+        'Client Reviews': { it: 'Recensioni Clienti' },
+        
+        // Filter tags
+        'All': { it: 'Tutto' },
+        'Modern': { it: 'Moderno' },
+        'Medieval': { it: 'Medievale' },
+        'Fantasy': { it: 'Fantasy' },
+        'Architecture': { it: 'Architettura' },
+        'Landscape': { it: 'Paesaggio' },
+        'Stone': { it: 'Pietra' },
+        'Wood': { it: 'Legno' },
+        'Metal': { it: 'Metallo' },
+        'Fabric': { it: 'Tessuto' },
+        'Nature': { it: 'Natura' },
+        'Furniture': { it: 'Mobili' },
+        'Vehicles': { it: 'Veicoli' },
+        'Characters': { it: 'Personaggi' },
+        'Props': { it: 'Oggetti' },
+        
+        // Contact section
+        'Get In Touch': { it: 'Mettiti in Contatto' },
+        'Email': { it: 'Email' },
+        'Discord': { it: 'Discord' },
+        'Fiverr': { it: 'Fiverr' },
+        'Behance': { it: 'Behance' },
+        'Website': { it: 'Sito Web' },
+        
+        // Stats and labels
+        'Projects': { it: 'Progetti' },
+        'Satisfaction': { it: 'Soddisfazione' },
+        'Years Experience': { it: 'Anni di Esperienza' },
+        
+        // Loading and search
+        'Loading builds...': { it: 'Caricamento costruzioni...' },
+        'Loading textures...': { it: 'Caricamento texture...' },
+        'Loading models...': { it: 'Caricamento modelli...' },
+        'Loading reviews...': { it: 'Caricamento recensioni...' },
+        'Search builds...': { it: 'Cerca costruzioni...' },
+        'Search textures...': { it: 'Cerca texture...' },
+        'Search models...': { it: 'Cerca modelli...' },
+        
+        // Hero section
+        'Transforming ideas into immersive experiences through stunning builds, detailed textures, and professional models': {
+            it: 'Trasformo idee in esperienze immersive attraverso costruzioni spettacolari, texture dettagliate e modelli professionali'
+        },
+        'Explore Portfolio': { it: 'Esplora Portfolio' },
+        
+        // Modal
+        'Portfolio Item': { it: 'Elemento Portfolio' },
+        'Title': { it: 'Titolo' },
+        'Description goes here.': { it: 'La descrizione va qui.' },
+        
+        // Footer
+        'All rights reserved': { it: 'Tutti i diritti riservati' }
     };
 
     // Set initial language
@@ -482,27 +569,106 @@ function initializeLanguage() {
             currentLanguageSpan.textContent = languageNames[lang];
         }
 
-        // Update all translatable elements
+        // First, handle elements with explicit translation attributes
         document.querySelectorAll('.translatable').forEach(element => {
             const translation = element.getAttribute(`data-${lang}`);
             if (translation) {
                 element.textContent = translation;
+                return;
             }
         });
 
+        // Automatic translation for all text elements
+        if (lang !== 'en') {
+            translatePageContent(lang);
+        } else {
+            // If switching back to English, reload the page or restore original content
+            restoreOriginalContent();
+        }
+
         // Update placeholders
-        document.querySelectorAll(`[data-${lang}-placeholder]`).forEach(input => {
-            const placeholder = input.getAttribute(`data-${lang}-placeholder`);
-            if (placeholder) {
-                input.placeholder = placeholder;
-            }
-        });
+        updatePlaceholders(lang);
 
         // Update active state in dropdown
         languageOptions.forEach(opt => {
             opt.classList.remove('active');
             if (opt.getAttribute('data-lang') === lang) {
                 opt.classList.add('active');
+            }
+        });
+    }
+
+    function translatePageContent(targetLang) {
+        // Store original content if not already stored
+        if (!window.originalContent) {
+            window.originalContent = new Map();
+        }
+
+        // Elements to translate automatically
+        const elementsToTranslate = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, span:not(.visually-hidden), .filter-tag, .stat-label, .footer-link, button:not(.btn-close):not(.navbar-toggler), .modal-title');
+        
+        elementsToTranslate.forEach(element => {
+            // Skip if element has explicit translation attributes or is already processed
+            if (element.hasAttribute('data-en') || element.classList.contains('language-processed')) {
+                return;
+            }
+
+            // Skip elements with only icons or empty content
+            const textContent = element.textContent.trim();
+            if (!textContent || textContent.length < 2) {
+                return;
+            }
+
+            // Store original content
+            if (!window.originalContent.has(element)) {
+                window.originalContent.set(element, textContent);
+            }
+
+            // Try to find translation in dictionary
+            const translation = translations[textContent];
+            if (translation && translation[targetLang]) {
+                element.textContent = translation[targetLang];
+                element.classList.add('language-processed');
+            }
+        });
+
+        // Handle input placeholders
+        document.querySelectorAll('input[placeholder]').forEach(input => {
+            const originalPlaceholder = input.getAttribute('placeholder');
+            if (!input.hasAttribute('data-original-placeholder')) {
+                input.setAttribute('data-original-placeholder', originalPlaceholder);
+            }
+            
+            const translation = translations[originalPlaceholder];
+            if (translation && translation[targetLang]) {
+                input.setAttribute('placeholder', translation[targetLang]);
+            }
+        });
+    }
+
+    function restoreOriginalContent() {
+        if (window.originalContent) {
+            window.originalContent.forEach((originalText, element) => {
+                if (element && element.parentNode) {
+                    element.textContent = originalText;
+                    element.classList.remove('language-processed');
+                }
+            });
+        }
+
+        // Restore original placeholders
+        document.querySelectorAll('input[data-original-placeholder]').forEach(input => {
+            const originalPlaceholder = input.getAttribute('data-original-placeholder');
+            input.setAttribute('placeholder', originalPlaceholder);
+        });
+    }
+
+    function updatePlaceholders(lang) {
+        // Handle elements with explicit placeholder attributes
+        document.querySelectorAll(`[data-${lang}-placeholder]`).forEach(input => {
+            const placeholder = input.getAttribute(`data-${lang}-placeholder`);
+            if (placeholder) {
+                input.placeholder = placeholder;
             }
         });
     }
