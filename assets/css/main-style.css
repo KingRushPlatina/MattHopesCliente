@@ -1239,6 +1239,346 @@ body.light-mode {
     padding: 3px 8px;
 }
 
+/* About Section */
+.about-section {
+    padding: 100px 0;
+    min-height: 100vh;
+    position: relative;
+}
+
+.about-content {
+    max-width: 100%;
+}
+
+.about-intro .lead {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: 0;
+}
+
+.light-mode .about-intro .lead {
+    color: var(--light-text);
+}
+
+.about-highlights {
+    margin: 3rem 0;
+}
+
+.highlight-card {
+    background-color: var(--card-bg);
+    border-radius: 15px;
+    padding: 2rem;
+    height: 100%;
+    transition: all var(--transition-speed) ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.light-mode .highlight-card {
+    background-color: var(--light-card);
+    border: 1px solid #dee2e6;
+}
+
+.highlight-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--accent-purple);
+    box-shadow: 0 10px 25px rgba(129, 50, 205, 0.15);
+}
+
+.highlight-icon {
+    color: var(--accent-purple);
+    font-size: 1.5rem;
+    margin-top: 0.2rem;
+}
+
+.highlight-card p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.light-mode .highlight-card p {
+    color: var(--light-text);
+}
+
+.skills-section {
+    margin-top: 3rem;
+}
+
+.skill-card {
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 2.5rem;
+    height: 100%;
+    transition: all var(--transition-speed) ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.light-mode .skill-card {
+    background-color: var(--light-card);
+    border: 1px solid #dee2e6;
+}
+
+.skill-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-purple);
+    box-shadow: 0 15px 35px rgba(129, 50, 205, 0.2);
+}
+
+.skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--accent-purple), #330A8B);
+    transform: scaleX(0);
+    transition: transform var(--transition-speed) ease;
+}
+
+.skill-card:hover::before {
+    transform: scaleX(1);
+}
+
+.skill-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.skill-icon {
+    color: var(--accent-purple);
+    font-size: 2rem;
+}
+
+.skill-header h4 {
+    color: var(--accent-purple);
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.skill-content p {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.light-mode .skill-content p {
+    color: var(--light-text);
+}
+
+.skill-content p:last-child {
+    margin-bottom: 0;
+}
+
+.about-conclusion {
+    text-align: center;
+}
+
+.conclusion-card {
+    background: linear-gradient(135deg, rgba(129, 50, 205, 0.1), rgba(51, 10, 139, 0.1));
+    border-radius: 20px;
+    padding: 3rem;
+    border: 1px solid var(--accent-purple);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.light-mode .conclusion-card {
+    background: linear-gradient(135deg, rgba(129, 50, 205, 0.05), rgba(51, 10, 139, 0.05));
+}
+
+.conclusion-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(129, 50, 205, 0.05), transparent);
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.conclusion-icon {
+    color: var(--accent-purple);
+    font-size: 2.5rem;
+    z-index: 1;
+}
+
+.conclusion-card .lead {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: var(--accent-purple);
+    z-index: 1;
+}
+
+/* My Services in About Page */
+.my-services-about {
+    border-top: 2px solid var(--accent-purple);
+    padding-top: 3rem;
+    margin-top: 3rem;
+}
+
+.services-subtitle {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: var(--accent-purple);
+    font-weight: 600;
+    position: relative;
+}
+
+.services-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(135deg, var(--accent-purple), #330A8B);
+    border-radius: 2px;
+}
+
+.service-card-about {
+    background-color: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    transition: all var(--transition-speed) ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    text-align: center;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.light-mode .service-card-about {
+    background-color: var(--light-card);
+    border: 1px solid #dee2e6;
+}
+
+.service-card-about::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--accent-purple), #330A8B);
+    transform: scaleX(0);
+    transition: transform var(--transition-speed) ease;
+}
+
+.service-card-about:hover::before {
+    transform: scaleX(1);
+}
+
+.service-card-about:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-purple);
+    box-shadow: 0 15px 35px rgba(129, 50, 205, 0.2);
+}
+
+.service-card-about .service-icon {
+    font-size: 3rem;
+    color: var(--accent-purple);
+    margin-bottom: 1.5rem;
+    transition: transform var(--transition-speed) ease;
+}
+
+.service-card-about:hover .service-icon {
+    transform: scale(1.1);
+}
+
+.service-card-about h4 {
+    color: var(--accent-purple);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.service-card-about p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.light-mode .service-card-about p {
+    color: var(--light-text);
+}
+
+/* Responsive Design for About Section */
+@media (max-width: 768px) {
+    .about-section {
+        padding: 60px 0;
+    }
+    
+    .about-intro .lead {
+        font-size: 1.1rem;
+    }
+    
+    .skill-card {
+        padding: 2rem;
+    }
+    
+    .skill-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .skill-header h4 {
+        font-size: 1.2rem;
+    }
+    
+    .conclusion-card {
+        padding: 2rem;
+    }
+    
+    .conclusion-card .lead {
+        font-size: 1.1rem;
+    }
+    
+    .services-subtitle {
+        font-size: 2rem;
+    }
+    
+    .service-card-about {
+        padding: 1.5rem;
+    }
+    
+    .service-card-about .service-icon {
+        font-size: 2.5rem;
+    }
+    
+    .service-card-about h4 {
+        font-size: 1.2rem;
+    }
+}
+
 /* Admin Section Styles */
 .admin-section {
     border-top: 2px solid var(--accent-purple);
