@@ -196,7 +196,7 @@ class ReviewsManager {
 
     displayAdminReviews(reviews) {
         const adminReviewsList = document.getElementById('admin-reviews-list');
-        if (!adminReviewsList || !this.currentUser) return;
+        if (!adminReviewsList) return;
 
         adminReviewsList.innerHTML = reviews.map(review => `
             <div class="admin-review-item ${!review.visible ? 'hidden-review' : ''}">

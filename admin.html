@@ -1042,13 +1042,11 @@
 
         // Initialize portfolio manager after authentication
         let portfolioManager;
-        
-        // Add this to the authentication check
+
         firebase.auth().onAuthStateChanged(function(user) {
             if (user) {
-                // User is signed in
                 document.getElementById('admin-user').textContent = `Welcome, ${user.email}`;
-                
+
                 // Initialize reviews manager for admin
                 if (typeof ReviewsManager !== 'undefined') {
                     window.reviewsManager = new ReviewsManager();
@@ -1056,6 +1054,8 @@
                     setTimeout(() => {
                         if (reviewsManager) {
                             reviewsManager.currentUser = user;
+                            // Carica subito le reviews dopo login
+                            reviewsManager.loadReviews();
                         }
                     }, 1000);
                 }
@@ -1063,7 +1063,6 @@
                 // Initialize portfolio manager
                 portfolioManager = new PortfolioManager();
             } else {
-                // User is not signed in, redirect to login
                 window.location.href = 'login.html';
             }
         });
