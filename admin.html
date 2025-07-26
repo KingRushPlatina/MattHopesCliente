@@ -968,6 +968,8 @@
                     setTimeout(() => {
                         if (reviewsManager) {
                             reviewsManager.currentUser = user;
+                            // Carica le recensioni dopo aver settato l'utente
+                            reviewsManager.loadReviews();
                         }
                     }, 1000);
                 }
