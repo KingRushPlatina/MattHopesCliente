@@ -177,10 +177,15 @@ class ReviewsManager {
         reviewsContainer.innerHTML = visibleReviews.map(review => `
             <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
                 <div class="review-card">
-                    <div class="review-header">
-                        <h5 class="review-name">${this.escapeHtml(review.clientName)}</h5>
-                        <div class="review-rating">
-                            ${this.generateStars(review.rating)}
+                    <div class="d-flex align-items-center mb-2">
+                        <div class="me-2" style="min-width:40px;max-width:40px;">
+                            ${review.profileImage ? `<img src="${review.profileImage}" alt="Profile" class="rounded-circle" style="width:36px;height:36px;object-fit:cover;">` : `<div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:36px;height:36px;"><i class='fas fa-user text-white'></i></div>`}
+                        </div>
+                        <div>
+                            <h5 class="review-name mb-0">${this.escapeHtml(review.clientName)}</h5>
+                            <div class="review-rating">
+                                ${this.generateStars(review.rating)}
+                            </div>
                         </div>
                     </div>
                     <div class="review-tags mb-3">
@@ -200,6 +205,9 @@ class ReviewsManager {
 
         adminReviewsList.innerHTML = reviews.map(review => `
             <div class="admin-review-item ${!review.visible ? 'hidden-review' : ''}">
+                <div class="me-3" style="min-width:56px;max-width:56px;">
+                    ${review.profileImage ? `<img src="${review.profileImage}" alt="Profile" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">` : `<div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;"><i class='fas fa-user text-white'></i></div>`}
+                </div>
                 <div class="review-info">
                     <h6>${this.escapeHtml(review.clientName)} - ${this.generateStars(review.rating)}</h6>
                     <div class="mb-2">
@@ -352,9 +360,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 rating: parseFloat(formData.get('rating')),
                 comment: formData.get('comment'),
                 nationality: formData.get('nationality'),
-                service: formData.get('service')
+                service: formData.get('service'),
+                profileImage: formData.get('profileImage') || ''
             };
-            
             await reviewsManager.addReview(reviewData);
             e.target.reset();
         });

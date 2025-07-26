@@ -405,11 +405,11 @@
             <div class="card-body">
                 <form id="add-review-form">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label for="clientName" class="form-label">Client Name</label>
                             <input type="text" class="form-control" name="clientName" required>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label for="rating" class="form-label">Rating</label>
                             <select class="form-control" name="rating" required>
                                 <option value="">Select Rating</option>
@@ -423,6 +423,11 @@
                                 <option value="1.5">1.5 Stars</option>
                                 <option value="1">1 Star</option>
                             </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="profileImage" class="form-label">Profile Image (optional)</label>
+                            <input type="url" class="form-control" name="profileImage" placeholder="https://...">
+                            <div class="form-text">URL immagine profilo (opzionale)</div>
                         </div>
                     </div>
                     <div class="row">
