@@ -53,19 +53,27 @@ function showPage(pageId) {
     document.querySelectorAll('.page-section').forEach(section => {
         section.classList.remove('active');
     });
-    // Show selected section
-    document.getElementById(pageId).classList.add('active');
+    
+    // Show selected section (check if it exists first)
+    const targetPage = document.getElementById(pageId);
+    if (targetPage) {
+        targetPage.classList.add('active');
+    }
+    
     // Close mobile menu if open
     const navbarCollapse = document.querySelector('.navbar-collapse');
-    if (navbarCollapse.classList.contains('show')) {
+    if (navbarCollapse && navbarCollapse.classList.contains('show')) {
         new bootstrap.Collapse(navbarCollapse).hide();
     }
+    
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
     
     // Re-initialize animations for the new page
     setTimeout(() => {
-        initAnimations();
+        if (typeof initAnimations === 'function') {
+            initAnimations();
+        }
     }, 100);
 }
 
@@ -148,7 +156,7 @@ function filterItems(section, filterType, searchTerm) {
 }
 
 // Modal functionality
-const portfolioData = {
+window.portfolioData = {
     build1: {
         title: 'Modern Glass House',
         image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80',
@@ -248,34 +256,117 @@ const portfolioData = {
 };
 
 function openModal(itemId) {
-    const item = portfolioData[itemId];
-    if (item) {
-        document.getElementById('modalTitle').textContent = item.title;
-        document.getElementById('modalItemTitle').textContent = item.title;
-        document.getElementById('modalImage').src = item.image;
-        document.getElementById('modalImage').alt = item.title;
-        document.getElementById('modalDescription').textContent = item.description;
-        const tagsContainer = document.getElementById('modalTags');
-        const colorClasses = [
-            'tag-blue', 'tag-green', 'tag-red', 'tag-aqua-green',
-            'tag-magenta', 'tag-light-blue', 'tag-yellow',
-            'tag-orange', 'tag-brown', 'tag-gray',
-            'tag-white', 'tag-black'
-        ];
+    const item = window.portfolioData[itemId];
+    if (!item) {
+        console.error('Portfolio item not found:', itemId);
+        return;
+    }
 
-        tagsContainer.innerHTML = item.tags.map(tag => {
-            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
-            return `<span class="tag ${randomColorClass}">${tag}</span>`;
-        }).join(' ');
-        const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
+    // Check if modal elements exist
+    const modalTitle = document.getElementById('modalTitle');
+    const modalItemTitle = document.getElementById('modalItemTitle');
+    const modalDescription = document.getElementById('modalDescription');
+    const tagsContainer = document.getElementById('modalTags');
+    const imageContainerDiv = document.getElementById('modalImageContainer');
+
+    if (!modalTitle || !modalItemTitle || !modalDescription || !tagsContainer || !imageContainerDiv) {
+        console.error('Modal elements not found');
+        return;
+    }
+
+    // Clear image container
+    imageContainerDiv.innerHTML = '';
+
+    // Set text content
+    modalTitle.textContent = item.title;
+    modalItemTitle.textContent = item.title;
+    modalDescription.textContent = item.description;
+
+    const colorClasses = [
+        'tag-blue', 'tag-green', 'tag-red', 'tag-aqua-green',
+        'tag-magenta', 'tag-light-blue', 'tag-yellow',
+        'tag-orange', 'tag-brown', 'tag-gray',
+        'tag-white', 'tag-black'
+    ];
+
+    tagsContainer.innerHTML = item.tags.map(tag => {
+        const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+        return `<span class="tag ${randomColorClass}">${tag}</span>`;
+    }).join(' ');
+
+    // Carousel delle immagini
+    const images = item.images && Array.isArray(item.images) ? item.images : [item.images || ''];
+    let carouselHtml = '';
+    const carouselId = `modalCarousel_${itemId}_${Date.now()}`;
+
+    if (images.length > 1) {
+        carouselHtml = `
+        <div id="${carouselId}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                ${images.map((_, idx) => `
+                    <button type="button" data-bs-target="#${carouselId}" data-bs-slide-to="${idx}" 
+                            class="${idx === 0 ? 'active' : ''}" aria-current="${idx === 0 ? 'true' : 'false'}" 
+                            aria-label="Slide ${idx + 1}"></button>
+                `).join('')}
+            </div>
+            <div class="carousel-inner">
+                ${images.map((img, idx) => `
+                    <div class="carousel-item${idx === 0 ? ' active' : ''}">
+                        <img src="${img}" class="d-block w-100" alt="${item.title}" style="max-height: 400px; object-fit: contain;">
+                    </div>
+                `).join('')}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#${carouselId}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#${carouselId}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>`;
+    } else if (images.length === 1 && images[0]) {
+        carouselHtml = `<img src="${images[0]}" alt="${item.title}" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: contain;">`;
+    } else {
+        carouselHtml = `<img src="" alt="No image" class="img-fluid rounded"><div class="text-muted text-center mt-2">Nessuna immagine disponibile</div>`;
+    }
+
+    // Insert new content
+    imageContainerDiv.innerHTML = carouselHtml;
+    if (images.length > 1) {
+        const newCarousel = document.getElementById(carouselId);
+        if (newCarousel) {
+            new bootstrap.Carousel(newCarousel);
+        }
+    }
+
+    const portfolioModal = document.getElementById('portfolioModal');
+    if (portfolioModal) {
+        const modal = new bootstrap.Modal(portfolioModal);
         modal.show();
-        
-        // Animate modal image
-        setTimeout(() => {
-            document.getElementById('modalImage').classList.add('animate');
-        }, 100);
     }
 }
+
+// Clear modal content when it's closed
+document.addEventListener('DOMContentLoaded', function() {
+    const portfolioModal = document.getElementById('portfolioModal');
+    if (portfolioModal) {
+        portfolioModal.addEventListener('hidden.bs.modal', function () {
+            // Clear modal content to prevent caching
+            const imageContainerDiv = document.getElementById('modalImageContainer');
+            if (imageContainerDiv) imageContainerDiv.innerHTML = '';
+            // Clear text content
+            const modalTitle = document.getElementById('modalTitle');
+            const modalItemTitle = document.getElementById('modalItemTitle');
+            const modalDescription = document.getElementById('modalDescription');
+            const modalTags = document.getElementById('modalTags');
+            if (modalTitle) modalTitle.textContent = '';
+            if (modalItemTitle) modalItemTitle.textContent = '';
+            if (modalDescription) modalDescription.textContent = '';
+            if (modalTags) modalTags.innerHTML = '';
+        });
+    }
+});
 
 // Back to top button
 const backToTopBtn = document.getElementById('backToTop');

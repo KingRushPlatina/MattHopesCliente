@@ -100,14 +100,23 @@ class PortfolioLoader {
             return;
         }
 
-        const html = items.map(item => `
+        const html = items.map(item => {
+            // Supporta sia il vecchio campo image (stringa) che il nuovo images (array)
+            const images = item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []);
+            const firstImage = images.length > 0 ? images[0] : '';
+            
+            // Tronca la descrizione a 125 caratteri
+            const description = item.description || '';
+            const truncatedDescription = description.length > 125 ? description.substring(0, 125) + '...' : description;
+            
+            return `
             <div class="portfolio-item" data-tags="${item.tags.join(' ')}" onclick="openModal('${item.id}')">
                 <div class="portfolio-img-container">
-                    <img src="${item.image}" alt="${item.title}">
+                    <img src="${firstImage}" alt="${item.title}">
                 </div>
                 <div class="portfolio-item-content">
                     <h5>${item.title}</h5>
-                    <p>${item.description}</p>
+                    <p>${truncatedDescription}</p>
                     <div>
                         ${item.tags.map(tag => {
                             const colorClasses = [
@@ -122,7 +131,8 @@ class PortfolioLoader {
                     </div>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
 
         grid.innerHTML = html;
 
@@ -143,7 +153,7 @@ class PortfolioLoader {
         [...this.portfolioData.builds, ...this.portfolioData.textures, ...this.portfolioData.models].forEach(item => {
             combinedData[item.id] = {
                 title: item.title,
-                image: item.image,
+                images: item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []),
                 description: item.description,
                 tags: item.tags
             };

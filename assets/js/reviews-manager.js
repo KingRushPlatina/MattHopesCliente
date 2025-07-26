@@ -196,7 +196,7 @@ class ReviewsManager {
 
     displayAdminReviews(reviews) {
         const adminReviewsList = document.getElementById('admin-reviews-list');
-        if (!adminReviewsList) return;
+        if (!adminReviewsList || !this.currentUser) return;
 
         adminReviewsList.innerHTML = reviews.map(review => `
             <div class="admin-review-item ${!review.visible ? 'hidden-review' : ''}">
@@ -231,9 +231,12 @@ class ReviewsManager {
             // Check if we're on the admin page specifically
             if (window.location.pathname.includes('admin.html')) {
                 this.loadReviews();
-            } else if (typeof showPage === 'function') {
-                // Hide login page and show admin dashboard (for index.html)
+            } else if (typeof showPage === 'function' && document.getElementById('admin')) {
+                // Hide login page and show admin dashboard (only for index.html with admin section)
                 showPage('admin');
+                this.loadReviews();
+            } else {
+                // Just load reviews without page navigation
                 this.loadReviews();
             }
         } else {
