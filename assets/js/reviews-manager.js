@@ -5,6 +5,7 @@ class ReviewsManager {
         this.db = null;
         this.auth = null;
         this.reviewsCollection = null;
+        this.reviewComments = {}; // Store full and truncated comments for toggling
         this.initFirebase();
     }
 
@@ -91,11 +92,22 @@ class ReviewsManager {
     // Reviews CRUD
     async addReview(reviewData) {
         try {
-            const docRef = await this.reviewsCollection.add({
+            // Use custom date if provided, otherwise use server timestamp
+            const dataToSave = {
                 ...reviewData,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 visible: true
-            });
+            };
+            
+            if (reviewData.reviewDate) {
+                // Convert date string to Firestore timestamp
+                const customDate = new Date(reviewData.reviewDate);
+                dataToSave.createdAt = firebase.firestore.Timestamp.fromDate(customDate);
+            } else {
+                // Fallback to server timestamp if no date provided
+                dataToSave.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
+            
+            const docRef = await this.reviewsCollection.add(dataToSave);
             this.showNotification('Recensione aggiunta con successo!', 'success');
             this.loadReviews(); // Reload reviews
             return docRef.id;
@@ -164,7 +176,6 @@ class ReviewsManager {
         if (!reviewsContainer) return;
 
         const visibleReviews = reviews.filter(review => review.visible);
-        
         if (visibleReviews.length === 0) {
             reviewsContainer.innerHTML = `
                 <div class="col-12 text-center">
@@ -174,7 +185,19 @@ class ReviewsManager {
             return;
         }
 
-        reviewsContainer.innerHTML = visibleReviews.map(review => `
+        // Prepara i commenti troncati e completi per toggle
+        this.reviewComments = {};
+        visibleReviews.forEach(review => {
+            this.reviewComments[review.id] = {
+                full: this.escapeHtml(review.comment),
+                truncated: this.escapeHtml(review.comment).length > 150 ? this.escapeHtml(review.comment).substring(0, 150) + '...' : this.escapeHtml(review.comment)
+            };
+        });
+
+        reviewsContainer.innerHTML = visibleReviews.map(review => {
+            const commentData = this.reviewComments[review.id];
+            const needsExpansion = commentData.full.length > 150;
+            return `
             <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up">
                 <div class="review-card">
                     <div class="d-flex align-items-center mb-2">
@@ -192,18 +215,43 @@ class ReviewsManager {
                         <span class="review-tag nationality-tag">${review.nationality || '🌍 Unknown'}</span>
                         <span class="review-tag service-tag">🛠️ ${review.service || 'General Service'}</span>
                     </div>
-                    <p class="review-comment">"${this.escapeHtml(review.comment)}"</p>
+                    <p class="review-comment" id="public-comment-${review.id}">"${commentData.truncated}"</p>
+                    ${needsExpansion ? `<button class="btn btn-sm btn-link p-0 text-decoration-none" id="public-toggle-btn-${review.id}" onclick="reviewsManager.togglePublicCommentDetails('${review.id}')"><i class='fas fa-eye me-1'></i>Vedi dettagli</button>` : ''}
                     <small class="review-date">${this.formatDate(review.createdAt)}</small>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    // Toggle per la parte pubblica
+    togglePublicCommentDetails(reviewId) {
+        const commentElement = document.getElementById(`public-comment-${reviewId}`);
+        const buttonElement = document.getElementById(`public-toggle-btn-${reviewId}`);
+        if (!commentElement || !buttonElement || !this.reviewComments || !this.reviewComments[reviewId]) return;
+        const { full, truncated } = this.reviewComments[reviewId];
+        if (commentElement.innerHTML.replace(/"/g, '') === truncated.replace(/"/g, '')) {
+            // Espandi
+            commentElement.innerHTML = '"' + full + '"';
+            buttonElement.innerHTML = '<i class="fas fa-eye-slash me-1"></i>Nascondi dettagli';
+        } else {
+            // Riduci
+            commentElement.innerHTML = '"' + truncated + '"';
+            buttonElement.innerHTML = '<i class="fas fa-eye me-1"></i>Vedi dettagli';
+        }
     }
 
     displayAdminReviews(reviews) {
         const adminReviewsList = document.getElementById('admin-reviews-list');
         if (!adminReviewsList || !this.currentUser) return;
 
-        adminReviewsList.innerHTML = reviews.map(review => `
+        adminReviewsList.innerHTML = reviews.map(review => {
+            const maxChars = 150; // Limite di caratteri per il commento
+            const comment = this.escapeHtml(review.comment);
+            const truncatedComment = comment.length > maxChars ? comment.substring(0, maxChars) + '...' : comment;
+            const needsExpansion = comment.length > maxChars;
+            
+            return `
             <div class="admin-review-item ${!review.visible ? 'hidden-review' : ''}">
                 <div class="me-3" style="min-width:56px;max-width:56px;">
                     ${review.profileImage ? `<img src="${review.profileImage}" alt="Profile" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;">` : `<div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;"><i class='fas fa-user text-white'></i></div>`}
@@ -214,8 +262,13 @@ class ReviewsManager {
                         <span class="badge bg-primary me-2">${review.nationality || '🌍 Unknown'}</span>
                         <span class="badge bg-secondary">🛠️ ${review.service || 'General Service'}</span>
                     </div>
-                    <p>${this.escapeHtml(review.comment)}</p>
-                    <small>${this.formatDate(review.createdAt)}</small>
+                    <p class="review-comment-text" id="comment-${review.id}">${truncatedComment}</p>
+                    ${needsExpansion ? `
+                        <button class="btn btn-sm btn-link p-0 text-decoration-none" id="toggle-btn-${review.id}" onclick="reviewsManager.toggleCommentDetails('${review.id}')">
+                            <i class="fas fa-eye me-1"></i>Vedi dettagli
+                        </button>
+                    ` : ''}
+                    <small class="d-block mt-2">${this.formatDate(review.createdAt)}</small>
                 </div>
                 <div class="review-actions">
                     <button class="btn btn-sm btn-outline-warning" onclick="reviewsManager.toggleReviewVisibility('${review.id}', ${review.visible})">
@@ -226,7 +279,19 @@ class ReviewsManager {
                     </button>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
+        
+        // Store the full comments for toggling
+        this.reviewComments = {};
+        reviews.forEach(review => {
+            this.reviewComments[review.id] = {
+                full: this.escapeHtml(review.comment),
+                truncated: this.escapeHtml(review.comment).length > 150 ? 
+                          this.escapeHtml(review.comment).substring(0, 150) + '...' : 
+                          this.escapeHtml(review.comment)
+            };
+        });
     }
 
     updateAdminUI() {
@@ -267,6 +332,37 @@ class ReviewsManager {
     // Method specifically for admin page
     loadAdminReviews() {
         this.loadReviews();
+    }
+
+    // Toggle comment details expansion/collapse
+    toggleCommentDetails(reviewId) {
+        console.log('Toggling comment details for review:', reviewId);
+        
+        const commentElement = document.getElementById(`comment-${reviewId}`);
+        const buttonElement = document.getElementById(`toggle-btn-${reviewId}`);
+        
+        console.log('Comment element:', commentElement);
+        console.log('Button element:', buttonElement);
+        console.log('Review comments data:', this.reviewComments && this.reviewComments[reviewId]);
+        
+        if (!commentElement || !buttonElement || !this.reviewComments || !this.reviewComments[reviewId]) {
+            console.error('Elements not found for review:', reviewId);
+            return;
+        }
+        
+        const { full, truncated } = this.reviewComments[reviewId];
+        
+        if (commentElement.innerHTML === truncated) {
+            // Expand to show full comment
+            commentElement.innerHTML = full;
+            buttonElement.innerHTML = '<i class="fas fa-eye-slash me-1"></i>Nascondi dettagli';
+            console.log('Expanded comment');
+        } else {
+            // Collapse to show truncated comment
+            commentElement.innerHTML = truncated;
+            buttonElement.innerHTML = '<i class="fas fa-eye me-1"></i>Vedi dettagli';
+            console.log('Collapsed comment');
+        }
     }
 
     // Utility methods
@@ -361,7 +457,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 comment: formData.get('comment'),
                 nationality: formData.get('nationality'),
                 service: formData.get('service'),
-                profileImage: formData.get('profileImage') || ''
+                profileImage: formData.get('profileImage') || '',
+                reviewDate: formData.get('reviewDate') // Add the custom date field
             };
             await reviewsManager.addReview(reviewData);
             e.target.reset();

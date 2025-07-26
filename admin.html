@@ -405,11 +405,11 @@
             <div class="card-body">
                 <form id="add-review-form">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="clientName" class="form-label">Client Name</label>
                             <input type="text" class="form-control" name="clientName" required>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
                             <label for="rating" class="form-label">Rating</label>
                             <select class="form-control" name="rating" required>
                                 <option value="">Select Rating</option>
@@ -424,7 +424,12 @@
                                 <option value="1">1 Star</option>
                             </select>
                         </div>
-                        <div class="col-md-4 mb-3">
+                        <div class="col-md-3 mb-3">
+                            <label for="reviewDate" class="form-label">Review Date</label>
+                            <input type="date" class="form-control" name="reviewDate" required>
+                            <div class="form-text">Data della recensione</div>
+                        </div>
+                        <div class="col-md-3 mb-3">
                             <label for="profileImage" class="form-label">Profile Image (optional)</label>
                             <input type="url" class="form-control" name="profileImage" placeholder="https://...">
                             <div class="form-text">URL immagine profilo (opzionale)</div>
@@ -916,10 +921,10 @@
                 const html = items.map(item => `
                     <div class="admin-portfolio-item border rounded p-2 mb-2" data-id="${item.id}">
                         <div class="d-flex align-items-center">
-                            <img src="${item.image}" alt="${item.title}" class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            <img src="${item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/40x40?text=No+Image'}" alt="${item.title}" class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0">${item.title}</h6>
-                                <small class="text-muted">${item.tags.join(', ')}</small>
+                                <small class="text-muted">${item.tags ? item.tags.join(', ') : 'No tags'}</small>
                             </div>
                             <div class="btn-group btn-group-sm">
                                 <button class="btn btn-outline-warning btn-sm" onclick="portfolioManager.editItem('${collection}', '${item.id}')">

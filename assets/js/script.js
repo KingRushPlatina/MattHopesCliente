@@ -60,6 +60,18 @@ function showPage(pageId) {
         targetPage.classList.add('active');
     }
     
+    // Handle My Services section visibility
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+        if (pageId === 'home') {
+            // Show services section only on home page
+            servicesSection.style.display = 'block';
+        } else {
+            // Hide services section on all other pages
+            servicesSection.style.display = 'none';
+        }
+    }
+    
     // Close mobile menu if open
     const navbarCollapse = document.querySelector('.navbar-collapse');
     if (navbarCollapse && navbarCollapse.classList.contains('show')) {
@@ -500,6 +512,12 @@ function initializeLanguage() {
 document.addEventListener('DOMContentLoaded', function() {
     initializeFilters();
     initializeLanguage();
+    
+    // Initialize services section visibility (show on home page by default)
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+        servicesSection.style.display = 'block';
+    }
     
     // Add scroll effect to navbar
     window.addEventListener('scroll', function() {
