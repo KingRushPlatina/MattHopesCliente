@@ -155,7 +155,8 @@ class PortfolioLoader {
                 title: item.title,
                 images: item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []),
                 description: item.description,
-                tags: item.tags
+                tags: item.tags,
+                typeTags: item.typeTags || [] // Include typeTags field
             };
         });
 

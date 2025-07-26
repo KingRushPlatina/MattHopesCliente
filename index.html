@@ -70,6 +70,10 @@
                         </a></li>
                     </ul>
                 </div>
+                <a href="#" class="btn btn-outline-purple me-3" id="shopButton" style="display: none;" target="_blank">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span class="translatable" data-en="Shop" data-it="Negozio">Shop</span>
+                </a>
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -127,6 +131,9 @@
                         </div>
                         <h4>3D Modeling</h4>
                         <p>Professional 3D modeling services for characters, props, and environments with high-quality textures and optimized topology.</p>
+                        <button class="btn btn-purple btn-sm mt-2" onclick="showPage('models')">
+                            <i class="fas fa-cube me-2"></i><span class="translatable" data-en="View Models Portfolio" data-it="Vedi Portfolio Modelli">View Models Portfolio</span>
+                        </button>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -136,6 +143,9 @@
                         </div>
                         <h4>Texture Creation</h4>
                         <p>Custom PBR textures and material creation for any surface with realistic details and seamless tiling.</p>
+                        <button class="btn btn-purple btn-sm mt-2" onclick="showPage('textures')">
+                            <i class="fas fa-paint-brush me-2"></i><span class="translatable" data-en="View Textures Portfolio" data-it="Vedi Portfolio Texture">View Textures Portfolio</span>
+                        </button>
                     </div>
                 </div>
                 <div class="col-md-4 mb-4">
@@ -145,6 +155,9 @@
                         </div>
                         <h4>Environment Design</h4>
                         <p>Complete environment builds for games and virtual worlds with optimized assets and lighting setups.</p>
+                        <button class="btn btn-purple btn-sm mt-2" onclick="showPage('builds')">
+                            <i class="fas fa-building me-2"></i><span class="translatable" data-en="View Builds Portfolio" data-it="Vedi Portfolio Costruzioni">View Builds Portfolio</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -427,6 +440,15 @@
                         <p>www.matthopes.com</p>
                     </div>
                 </div>
+                <div class="col-md-6 col-lg-4" id="shopContactItem" style="display: none;">
+                    <div class="contact-item">
+                        <i class="fas fa-shopping-cart contact-icon"></i>
+                        <h5 class="translatable" data-en="Shop" data-it="Negozio">Shop</h5>
+                        <p><a href="#" id="shopContactLink" target="_blank" style="color: inherit; text-decoration: none;">
+                            <span class="translatable" data-en="Visit our shop" data-it="Visita il nostro negozio">Visit our shop</span>
+                        </a></p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -444,6 +466,9 @@
                         <!-- Image on Left -->
                         <div class="flex-shrink-0" style="max-width: 300px;">
                             <div id="modalImageContainer"></div>
+                            <div class="modal-type-tags" id="modalTypeTags" style="display: none; margin-top: 0.75rem;">
+                                <!-- Type tags go here -->
+                            </div>
                         </div>
 
                         <!-- Content on Right -->
@@ -473,6 +498,7 @@
                 <a href="#" class="footer-link translatable" onclick="showPage('models')" data-en="Models" data-it="Modelli">Models</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('reviews')" data-en="Reviews" data-it="Recensioni">Reviews</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('contact')" data-en="Contact" data-it="Contatto">Contact</a>
+                <a href="#" id="shopFooterLink" class="footer-link translatable" target="_blank" style="display: none;" data-en="Shop" data-it="Negozio">Shop</a>
             </div>
             <div class="social-icons">
                 <a href="https://dsc.gg/matt-hopes" target="_blank" class="social-icon"><i class="fab fa-discord"></i></a>

@@ -306,6 +306,23 @@ function openModal(itemId) {
         return `<span class="tag ${randomColorClass}">${tag}</span>`;
     }).join(' ');
 
+    // Add type tags if they exist
+    if (item.typeTags && item.typeTags.length > 0) {
+        const typeTags = document.getElementById('modalTypeTags');
+        if (typeTags) {
+            typeTags.innerHTML = item.typeTags.map(tag => {
+                const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+                return `<span class="type-tag ${randomColorClass}">${tag}</span>`;
+            }).join(' ');
+            typeTags.style.display = 'block';
+        }
+    } else {
+        const typeTags = document.getElementById('modalTypeTags');
+        if (typeTags) {
+            typeTags.style.display = 'none';
+        }
+    }
+
     // Carousel delle immagini
     const images = item.images && Array.isArray(item.images) ? item.images : [item.images || ''];
     let carouselHtml = '';
@@ -372,10 +389,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const modalItemTitle = document.getElementById('modalItemTitle');
             const modalDescription = document.getElementById('modalDescription');
             const modalTags = document.getElementById('modalTags');
+            const modalTypeTags = document.getElementById('modalTypeTags');
             if (modalTitle) modalTitle.textContent = '';
             if (modalItemTitle) modalItemTitle.textContent = '';
             if (modalDescription) modalDescription.textContent = '';
             if (modalTags) modalTags.innerHTML = '';
+            if (modalTypeTags) {
+                modalTypeTags.innerHTML = '';
+                modalTypeTags.style.display = 'none';
+            }
         });
     }
 });
@@ -596,6 +618,11 @@ function initializeLanguage() {
                 opt.classList.add('active');
             }
         });
+        
+        // Update shop elements text for new language
+        if (window.shopManager) {
+            shopManager.updateShopTexts();
+        }
     }
 
     function translatePageContent(targetLang) {
@@ -741,4 +768,157 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
         });
     });
+    
+    // Initialize shop settings
+    if (typeof firebase !== 'undefined') {
+        shopManager = new ShopSettingsManager();
+    } else {
+        // Wait for Firebase to load
+        setTimeout(() => {
+            shopManager = new ShopSettingsManager();
+        }, 1000);
+    }
 });
+
+// Shop Settings Manager - Single database call
+class ShopSettingsManager {
+    constructor() {
+        this.settings = null;
+        this.initializeShop();
+    }
+
+    async initializeShop() {
+        try {
+            await this.loadSettings();
+            this.updateAllShopElements();
+            this.setupEventListeners();
+        } catch (error) {
+            console.error('Error initializing shop:', error);
+        }
+    }
+
+    async loadSettings() {
+        try {
+            const doc = await firebase.firestore().collection('settings').doc('site').get();
+            if (doc.exists) {
+                this.settings = doc.data();
+            } else {
+                this.settings = { shopUrl: '', shopButtonText: 'Shop', shopButtonTextIt: 'Negozio' };
+            }
+        } catch (error) {
+            console.error('Error loading shop settings:', error);
+            this.settings = { shopUrl: '', shopButtonText: 'Shop', shopButtonTextIt: 'Negozio' };
+        }
+    }
+
+    updateAllShopElements() {
+        if (!this.settings) return;
+
+        const hasShopUrl = this.settings.shopUrl && this.settings.shopUrl.trim();
+        
+        // Update navbar shop button
+        const shopButton = document.getElementById('shopButton');
+        if (shopButton) {
+            if (hasShopUrl) {
+                shopButton.href = this.settings.shopUrl;
+                shopButton.style.display = 'inline-flex';
+            } else {
+                shopButton.style.display = 'none';
+            }
+        }
+        
+        // Update contact section shop item
+        const shopContactItem = document.getElementById('shopContactItem');
+        const shopContactLink = document.getElementById('shopContactLink');
+        if (shopContactItem && shopContactLink) {
+            if (hasShopUrl) {
+                shopContactLink.href = this.settings.shopUrl;
+                shopContactItem.style.display = 'block';
+            } else {
+                shopContactItem.style.display = 'none';
+            }
+        }
+
+        // Update footer shop link
+        const shopFooterLink = document.getElementById('shopFooterLink');
+        if (shopFooterLink) {
+            if (hasShopUrl) {
+                shopFooterLink.href = this.settings.shopUrl;
+                shopFooterLink.style.display = 'inline';
+            } else {
+                shopFooterLink.style.display = 'none';
+            }
+        }
+
+        // Update text based on current language
+        this.updateShopTexts();
+    }
+
+    updateShopTexts() {
+        if (!this.settings) return;
+
+        const currentLanguage = localStorage.getItem('language') || 'en';
+        
+        // Update navbar button text
+        const shopButtonText = document.querySelector('#shopButton .translatable');
+        if (shopButtonText) {
+            shopButtonText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
+            shopButtonText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
+            const translation = shopButtonText.getAttribute(`data-${currentLanguage}`);
+            if (translation) {
+                shopButtonText.textContent = translation;
+            }
+        }
+        
+        // Update contact section text
+        const shopContactText = document.querySelector('#shopContactItem h5');
+        if (shopContactText) {
+            shopContactText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
+            shopContactText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
+            const translation = shopContactText.getAttribute(`data-${currentLanguage}`);
+            if (translation) {
+                shopContactText.textContent = translation;
+            }
+        }
+
+        // Update footer text
+        const shopFooterText = document.getElementById('shopFooterLink');
+        if (shopFooterText) {
+            shopFooterText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
+            shopFooterText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
+            const translation = shopFooterText.getAttribute(`data-${currentLanguage}`);
+            if (translation) {
+                shopFooterText.textContent = translation;
+            }
+        }
+    }
+
+    setupEventListeners() {
+        // Listen for settings updates from admin
+        window.addEventListener('shopSettingsUpdated', (event) => {
+            this.settings = event.detail;
+            this.updateAllShopElements();
+        });
+
+        // Listen for localStorage changes (from admin in another tab)
+        window.addEventListener('storage', (event) => {
+            if (event.key === 'shopSettings') {
+                try {
+                    this.settings = JSON.parse(event.newValue);
+                    this.updateAllShopElements();
+                } catch (error) {
+                    console.error('Error parsing shop settings from localStorage:', error);
+                }
+            }
+        });
+    }
+
+    // Public method to refresh settings
+    async refreshSettings() {
+        await this.loadSettings();
+        this.updateAllShopElements();
+    }
+}
+
+// Initialize shop manager when page loads
+let shopManager;
