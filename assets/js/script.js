@@ -117,35 +117,43 @@ themeToggle.addEventListener('click', () => {
 
 // Filter functionality
 function initializeFilters() {
-    const sections = ['builds', 'textures', 'models'];
+    const sections = ['builds', 'textures', 'models', 'shop'];
     sections.forEach(section => {
         const filterTags = document.querySelectorAll(`#${section} .filter-tag`);
         const searchBox = document.getElementById(`${section}Search`);
         const grid = document.getElementById(`${section}Grid`);
         
-        // Filter tag functionality
-        filterTags.forEach(tag => {
-            tag.addEventListener('click', () => {
-                // Update active tag
-                filterTags.forEach(t => t.classList.remove('active'));
-                tag.classList.add('active');
-                // Filter items
-                filterItems(section, tag.dataset.filter, searchBox.value);
+        // Filter tag functionality (skip for shop - no category filters)
+        if (section !== 'shop') {
+            filterTags.forEach(tag => {
+                tag.addEventListener('click', () => {
+                    // Update active tag
+                    filterTags.forEach(t => t.classList.remove('active'));
+                    tag.classList.add('active');
+                    // Filter items
+                    filterItems(section, tag.dataset.filter, searchBox.value);
+                });
             });
-        });
+        }
         
         // Search functionality
         if (searchBox) {
             searchBox.addEventListener('input', () => {
-                const activeFilter = document.querySelector(`#${section} .filter-tag.active`).dataset.filter;
-                filterItems(section, activeFilter, searchBox.value);
+                if (section === 'shop') {
+                    // Shop only has search, no category filters
+                    filterItems(section, 'all', searchBox.value);
+                } else {
+                    const activeFilter = document.querySelector(`#${section} .filter-tag.active`).dataset.filter;
+                    filterItems(section, activeFilter, searchBox.value);
+                }
             });
         }
     });
 }
 
 function filterItems(section, filterType, searchTerm) {
-    const items = document.querySelectorAll(`#${section}Grid .portfolio-item`);
+    const itemSelector = section === 'shop' ? '.shop-item' : '.portfolio-item';
+    const items = document.querySelectorAll(`#${section}Grid ${itemSelector}`);
     items.forEach(item => {
         const tags = item.dataset.tags.toLowerCase();
         const title = item.querySelector('h5').textContent.toLowerCase();
@@ -922,3 +930,12 @@ class ShopSettingsManager {
 
 // Initialize shop manager when page loads
 let shopManager;
+
+// Function to redirect to shop item
+function redirectToShopItem(customLink) {
+    if (customLink && customLink !== '#') {
+        window.open(customLink, '_blank');
+    } else {
+        console.warn('No custom link provided for this shop item');
+    }
+}

@@ -53,6 +53,9 @@
                     <a class="nav-link translatable" href="#" onclick="showPage('about')" data-en="About" data-it="Chi Sono">About</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link translatable" href="#" onclick="showPage('shop')" data-en="Shop" data-it="Negozio">Shop</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link translatable" href="#" onclick="showPage('reviews')" data-en="Reviews" data-it="Recensioni">Reviews</a>
                 </li>
                 <li class="nav-item">
@@ -534,6 +537,82 @@
         </div>
     </section>
     
+    <!-- Shop Page -->
+    <section id="shop" class="page-section portfolio-section">
+        <div class="container">
+            <h2 class="section-title translatable" data-en="Shop" data-it="Negozio">Shop</h2>
+            <p class="text-center mb-4 translatable" 
+               data-en="Discover our premium products and services. Click on any item to purchase or learn more."
+               data-it="Scopri i nostri prodotti e servizi premium. Clicca su qualsiasi articolo per acquistare o saperne di più.">
+                Discover our premium products and services. Click on any item to purchase or learn more.
+            </p>
+            
+            <div class="filter-controls">
+                <div class="w-100 d-flex justify-content-center">
+                    <input type="text" class="form-control search-box" id="shopSearch" placeholder="Search products..." data-en-placeholder="Search products..." data-it-placeholder="Cerca prodotti...">
+                </div>
+            </div>
+            <div class="portfolio-grid" id="shopGrid">
+                <!-- Shop items will be loaded dynamically -->
+                <div class="col-12 text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading shop items...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info Section -->
+            <div class="mt-5 pt-5 text-center">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <h3 class="mb-4 translatable" data-en="Why Choose Our Products?" data-it="Perché Scegliere i Nostri Prodotti?">Why Choose Our Products?</h3>
+                        <div class="row">
+                            <div class="col-md-4 mb-4">
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <h5 class="translatable" data-en="Premium Quality" data-it="Qualità Premium">Premium Quality</h5>
+                                    <p class="translatable" 
+                                       data-en="All our products are crafted with attention to detail and professional standards."
+                                       data-it="Tutti i nostri prodotti sono realizzati con attenzione ai dettagli e standard professionali.">
+                                        All our products are crafted with attention to detail and professional standards.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-download"></i>
+                                    </div>
+                                    <h5 class="translatable" data-en="Instant Download" data-it="Download Immediato">Instant Download</h5>
+                                    <p class="translatable" 
+                                       data-en="Get immediate access to your purchases with instant download links."
+                                       data-it="Ottieni accesso immediato ai tuoi acquisti con link di download istantanei.">
+                                        Get immediate access to your purchases with instant download links.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="feature-card">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-headset"></i>
+                                    </div>
+                                    <h5 class="translatable" data-en="Support Included" data-it="Supporto Incluso">Support Included</h5>
+                                    <p class="translatable" 
+                                       data-en="Professional support and guidance for all your purchased products."
+                                       data-it="Supporto professionale e assistenza per tutti i prodotti acquistati.">
+                                        Professional support and guidance for all your purchased products.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     <!-- Reviews Page -->
     <section id="reviews" class="page-section portfolio-section">
         <div class="container">
@@ -691,6 +770,7 @@
                 <a href="#" class="footer-link translatable" onclick="showPage('builds')" data-en="Builds" data-it="Costruzioni">Builds</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('textures')" data-en="Textures" data-it="Texture">Textures</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('models')" data-en="Models" data-it="Modelli">Models</a>
+                <a href="#" class="footer-link translatable" onclick="showPage('shop')" data-en="Shop" data-it="Negozio">Shop</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('reviews')" data-en="Reviews" data-it="Recensioni">Reviews</a>
                 <a href="#" class="footer-link translatable" onclick="showPage('contact')" data-en="Contact" data-it="Contatto">Contact</a>
                 <a href="#" id="shopFooterLink" class="footer-link translatable" target="_blank" style="display: none;" data-en="Shop" data-it="Negozio">Shop</a>

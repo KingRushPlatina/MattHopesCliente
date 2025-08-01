@@ -4,7 +4,8 @@ class PortfolioLoader {
         this.portfolioData = {
             builds: [],
             textures: [],
-            models: []
+            models: [],
+            shop: []
         };
         this.loadAllPortfolioData();
     }
@@ -15,7 +16,8 @@ class PortfolioLoader {
             await Promise.all([
                 this.loadBuilds(),
                 this.loadTextures(),
-                this.loadModels()
+                this.loadModels(),
+                this.loadShop()
             ]);
 
             // Update the UI after loading
@@ -73,6 +75,22 @@ class PortfolioLoader {
         }
     }
 
+    async loadShop() {
+        try {
+            const snapshot = await firebase.firestore().collection('shop').get();
+            this.portfolioData.shop = [];
+            snapshot.forEach(doc => {
+                this.portfolioData.shop.push({ 
+                    id: doc.id, 
+                    ...doc.data(),
+                    type: 'shop'
+                });
+            });
+        } catch (error) {
+            console.error('Error loading shop items:', error);
+        }
+    }
+
     updatePortfolioUI() {
         // Update builds grid
         this.renderPortfolioGrid('buildsGrid', this.portfolioData.builds);
@@ -82,6 +100,9 @@ class PortfolioLoader {
         
         // Update models grid
         this.renderPortfolioGrid('modelsGrid', this.portfolioData.models);
+
+        // Update shop grid
+        this.renderShopGrid('shopGrid', this.portfolioData.shop);
 
         // Update the global portfolioData for modal functionality
         this.updateGlobalPortfolioData();
@@ -146,17 +167,86 @@ class PortfolioLoader {
         }, 100);
     }
 
+    renderShopGrid(gridId, items) {
+        const grid = document.getElementById(gridId);
+        if (!grid) return;
+
+        if (items.length === 0) {
+            grid.innerHTML = `
+                <div class="col-12 text-center">
+                    <p class="text-muted">No shop items found</p>
+                </div>
+            `;
+            return;
+        }
+
+        const html = items.map(item => {
+            // Supporta sia il vecchio campo image (stringa) che il nuovo images (array)
+            const images = item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []);
+            const firstImage = images.length > 0 ? images[0] : '';
+            
+            // Tronca la descrizione a 100 caratteri per fare spazio al prezzo
+            const description = item.description || '';
+            const truncatedDescription = description.length > 100 ? description.substring(0, 100) + '...' : description;
+            
+            return `
+            <div class="shop-item" data-tags="${(item.tags || []).join(' ')}" onclick="redirectToShopItem('${item.customLink || '#'}')">
+                <div class="portfolio-img-container">
+                    <img src="${firstImage}" alt="${item.title}">
+                    <div class="shop-price-overlay">
+                        <span class="shop-price">${item.price || 'Price on request'}</span>
+                    </div>
+                </div>
+                <div class="portfolio-item-content">
+                    <h5>${item.title}</h5>
+                    <p>${truncatedDescription}</p>
+                    <div class="shop-item-footer">
+                        <div class="shop-item-tags">
+                            ${(item.tags || []).map(tag => {
+                                const colorClasses = [
+                                    'tag-blue', 'tag-green', 'tag-red', 'tag-aqua-green',
+                                    'tag-magenta', 'tag-light-blue', 'tag-yellow',
+                                    'tag-orange', 'tag-brown', 'tag-gray',
+                                    'tag-white', 'tag-black'
+                                ];
+                                const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+                                return `<span class="tag ${randomColorClass}">${tag}</span>`;
+                            }).join(' ')}
+                        </div>
+                        <button class="btn btn-purple btn-sm shop-buy-btn" onclick="event.stopPropagation(); redirectToShopItem('${item.customLink || '#'}')">
+                            <i class="fas fa-shopping-cart me-1"></i>Buy Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        grid.innerHTML = html;
+
+        // Animate items
+        setTimeout(() => {
+            grid.querySelectorAll('.shop-item').forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('animate');
+                }, index * 100);
+            });
+        }, 100);
+    }
+
     updateGlobalPortfolioData() {
         // Create a combined portfolio data object for the modal system
         const combinedData = {};
         
-        [...this.portfolioData.builds, ...this.portfolioData.textures, ...this.portfolioData.models].forEach(item => {
+        [...this.portfolioData.builds, ...this.portfolioData.textures, ...this.portfolioData.models, ...this.portfolioData.shop].forEach(item => {
             combinedData[item.id] = {
                 title: item.title,
                 images: item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []),
                 description: item.description,
                 tags: item.tags,
-                typeTags: item.typeTags || [] // Include typeTags field
+                typeTags: item.typeTags || [], // Include typeTags field
+                price: item.price,
+                customLink: item.customLink
             };
         });
 
@@ -182,6 +272,10 @@ class PortfolioLoader {
             case 'models':
                 await this.loadModels();
                 this.renderPortfolioGrid('modelsGrid', this.portfolioData.models);
+                break;
+            case 'shop':
+                await this.loadShop();
+                this.renderShopGrid('shopGrid', this.portfolioData.shop);
                 break;
         }
         this.updateGlobalPortfolioData();
@@ -209,6 +303,15 @@ class PortfolioLoader {
     
     get models() {
         return this.portfolioData.models;
+    }
+
+    get shop() {
+        return this.portfolioData.shop;
+    }
+
+    // Method to handle portfolio changes from admin
+    async handlePortfolioChange(type) {
+        await this.refreshPortfolioType(type);
     }
 }
 

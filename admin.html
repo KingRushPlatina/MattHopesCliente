@@ -656,7 +656,7 @@
         <!-- Portfolio Management Section -->
         <div class="row">
             <!-- Builds Management -->
-            <div class="col-md-4 mb-4">
+            <div class="col-md-3 mb-4">
                 <div class="card admin-card">
                     <div class="card-header">
                         <h5 class="translatable" data-en="Manage Builds" data-it="Gestisci Costruzioni"><i class="fas fa-building me-2"></i>Manage Builds</h5>
@@ -675,7 +675,7 @@
             </div>
 
             <!-- Textures Management -->
-            <div class="col-md-4 mb-4">
+            <div class="col-md-3 mb-4">
                 <div class="card admin-card">
                     <div class="card-header">
                         <h5 class="translatable" data-en="Manage Textures" data-it="Gestisci Texture"><i class="fas fa-palette me-2"></i>Manage Textures</h5>
@@ -694,7 +694,7 @@
             </div>
 
             <!-- Models Management -->
-            <div class="col-md-4 mb-4">
+            <div class="col-md-3 mb-4">
                 <div class="card admin-card">
                     <div class="card-header">
                         <h5 class="translatable" data-en="Manage Models" data-it="Gestisci Modelli"><i class="fas fa-cube me-2"></i>Manage Models</h5>
@@ -704,6 +704,25 @@
                             <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Model" data-it="Aggiungi Modello">Add Model</span>
                         </button>
                         <div id="models-list" style="max-height: 300px; overflow-y: auto;">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shop Management -->
+            <div class="col-md-3 mb-4">
+                <div class="card admin-card">
+                    <div class="card-header">
+                        <h5 class="translatable" data-en="Manage Shop" data-it="Gestisci Negozio"><i class="fas fa-shopping-cart me-2"></i>Manage Shop</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-purple btn-sm mb-3 w-100" data-bs-toggle="modal" data-bs-target="#addShopModal">
+                            <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Product" data-it="Aggiungi Prodotto">Add Product</span>
+                        </button>
+                        <div id="shop-list" style="max-height: 300px; overflow-y: auto;">
                             <div class="text-center">
                                 <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                             </div>
@@ -883,6 +902,64 @@
                             </div>
                             <button type="submit" class="btn btn-purple">
                                 <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Model" data-it="Aggiungi Modello">Add Model</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Shop Modal -->
+        <div class="modal fade" id="addShopModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title translatable" data-en="Add New Product" data-it="Aggiungi Nuovo Prodotto">Add New Product</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="add-shop-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" name="title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Price" data-it="Prezzo">Price</label>
+                                    <input type="text" class="form-control" name="price" placeholder="e.g. $29.99, €25.00, Free" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Custom Link" data-it="Link Personalizzato">Custom Link</label>
+                                    <input type="url" class="form-control" name="customLink" placeholder="https://example.com/buy-product" required>
+                                    <div class="form-text translatable" data-en="URL where users will be redirected when clicking the product" data-it="URL dove gli utenti verranno reindirizzati cliccando il prodotto">URL where users will be redirected when clicking the product</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Images (Any Image URLs)" data-it="Immagini (Qualsiasi URL Immagine)">Images (Any Image URLs)</label>
+                                    <input type="url" class="form-control mb-2" name="image1" placeholder="https://images.pexels.com/photos/34150/pexels-photo.jpg" required>
+                                    <input type="url" class="form-control mb-2" name="image2" placeholder="https://images.unsplash.com/photo-xyz/image.jpg">
+                                    <input type="url" class="form-control mb-2" name="image3" placeholder="https://your-cdn.com/image3.jpg">
+                                    <input type="url" class="form-control mb-2" name="image4" placeholder="https://imgur.com/image4.jpg">
+                                    <input type="url" class="form-control mb-2" name="image5" placeholder="https://any-image-host.com/image5.jpg">
+                                    <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" name="tags" placeholder="e.g. digital, bundle, premium" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Type Tags (comma separated - optional)" data-it="Tag Tipo (separati da virgola - opzionale)">Type Tags (comma separated - optional)</label>
+                                <input type="text" class="form-control" name="typeTags" placeholder="e.g. New, Featured, Limited">
+                                <div class="form-text translatable" data-en="Colored type tags that appear under the image" data-it="Tag colorati che appaiono sotto l'immagine">Colored type tags that appear under the image</div>
+                            </div>
+                            <button type="submit" class="btn btn-purple">
+                                <i class="fas fa-plus me-2"></i><span class="translatable" data-en="Add Product" data-it="Aggiungi Prodotto">Add Product</span>
                             </button>
                         </form>
                     </div>
@@ -1677,6 +1754,7 @@
                 this.currentBuilds = {};
                 this.currentTextures = {};
                 this.currentModels = {};
+                this.currentShop = {};
                 this.initializePortfolioManagement();
             }
 
@@ -1685,6 +1763,7 @@
                 this.loadBuilds();
                 this.loadTextures();
                 this.loadModels();
+                this.loadShop();
 
                 // Set up form event listeners
                 this.setupFormEventListeners();
@@ -1725,6 +1804,18 @@
                     });
                 } else {
                     console.error('Model form not found!');
+                }
+
+                // Shop form
+                const shopForm = document.getElementById('add-shop-form');
+                if (shopForm) {
+                    shopForm.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        console.log('Shop form submitted');
+                        this.addShopItem(new FormData(e.target), e.target);
+                    });
+                } else {
+                    console.error('Shop form not found!');
                 }
             }
 
@@ -1809,6 +1900,81 @@
                 }
             }
 
+            async addShopItem(formData, formElement) {
+                console.log('Adding shop item...');
+                console.log('Form data:', Object.fromEntries(formData.entries()));
+                
+                const submitBtn = formElement.querySelector('button[type="submit"]');
+                const originalBtnText = submitBtn.innerHTML;
+                
+                try {
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+
+                    // Collect image URLs from the form
+                    const images = [];
+                    for (let i = 1; i <= 5; i++) {
+                        const imageUrl = formData.get(`image${i}`);
+                        if (imageUrl && imageUrl.trim()) {
+                            images.push(imageUrl.trim());
+                        }
+                    }
+
+                    if (images.length === 0) {
+                        throw new Error('At least one image URL is required');
+                    }
+
+                    // Prepare data for Firestore
+                    const data = {
+                        title: formData.get('title'),
+                        price: formData.get('price'),
+                        customLink: formData.get('customLink'),
+                        description: formData.get('description'),
+                        images: images,
+                        tags: formData.get('tags').split(',').map(tag => tag.trim()).filter(tag => tag),
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+
+                    // Add typeTags if provided
+                    const typeTags = formData.get('typeTags');
+                    if (typeTags && typeTags.trim()) {
+                        data.typeTags = typeTags.split(',').map(tag => tag.trim()).filter(tag => tag);
+                    }
+
+                    console.log('Shop data to be saved:', data);
+                    
+                    await firebase.firestore().collection('shop').add(data);
+                    
+                    // Show success message
+                    alert('Product added successfully!');
+                    
+                    // Reset form and close modal
+                    formElement.reset();
+                    
+                    // Close modal
+                    const modalId = formElement.closest('.modal').id;
+                    bootstrap.Modal.getInstance(document.getElementById(modalId)).hide();
+                    
+                    // Reload the shop list
+                    this.loadShop();
+
+                    // Notify portfolio loader if it exists (for main site)
+                    if (window.portfolioLoader) {
+                        await window.portfolioLoader.handlePortfolioChange('shop');
+                    }
+
+                } catch (error) {
+                    console.error('Error adding shop item:', error);
+                    alert(`Error adding product: ${error.message || 'Please try again.'}`);
+                } finally {
+                    // Restore button state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                }
+            }
+
             async loadBuilds() {
                 console.log('Loading builds...');
                 try {
@@ -1881,6 +2047,30 @@
                 }
             }
 
+            async loadShop() {
+                console.log('Loading shop items...');
+                try {
+                    const snapshot = await firebase.firestore().collection('shop').orderBy('createdAt', 'desc').get();
+                    const shop = [];
+                    this.currentShop = {}; // Reset
+                    
+                    snapshot.forEach(doc => {
+                        const shopData = { id: doc.id, ...doc.data() };
+                        shop.push(shopData);
+                        this.currentShop[doc.id] = shopData;
+                        console.log('Loaded shop item:', doc.id, shopData.title);
+                    });
+                    
+                    console.log('Total shop items loaded:', shop.length);
+                    console.log('Current shop keys:', Object.keys(this.currentShop));
+                    
+                    this.displayShopItems(shop);
+                } catch (error) {
+                    console.error('Error loading shop items:', error);
+                    document.getElementById('shop-list').innerHTML = '<p class="text-danger">Error loading shop items</p>';
+                }
+            }
+
             displayPortfolioItems(collection, items) {
                 const container = document.getElementById(`${collection}-list`);
                 
@@ -1914,6 +2104,50 @@
                                     <i class="fas fa-edit"></i>
                                 </button>
                                 <button class="btn btn-outline-danger btn-sm" onclick="portfolioManager.deleteItem('${collection}', '${itemId}')" title="Elimina">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+
+                container.innerHTML = html;
+            }
+
+            displayShopItems(items) {
+                const container = document.getElementById('shop-list');
+                
+                if (items.length === 0) {
+                    container.innerHTML = '<p class="text-muted">No shop items found</p>';
+                    return;
+                }
+
+                console.log('Displaying shop items:', items.map(item => ({ 
+                    documentId: item.id, 
+                    title: item.title,
+                    price: item.price
+                })));
+
+                const html = items.map(item => {
+                    const itemId = item.id; // This is the Firestore document ID
+                    console.log('Creating button for shop item with document ID:', itemId);
+                    
+                    return `
+                    <div class="admin-portfolio-item border rounded p-2 mb-2" data-id="${itemId}">
+                        <div class="d-flex align-items-center">
+                            <img src="${item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/40x40?text=No+Image'}" alt="${item.title}" class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0">${item.title}</h6>
+                                <small class="text-success fw-bold">${item.price || 'No price'}</small>
+                                <small class="d-block text-muted">${item.tags ? item.tags.join(', ') : 'No tags'}</small>
+                                <small class="d-block text-info">Doc ID: ${itemId}</small>
+                            </div>
+                            <div class="btn-group btn-group-sm">
+                                <button class="btn btn-outline-warning btn-sm" onclick="portfolioManager.editShopItem('${itemId}')" title="Modifica">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="portfolioManager.deleteShopItem('${itemId}')" title="Elimina">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -2165,6 +2399,47 @@
                     alert(`Errore nell'aggiornamento del ${collection.slice(0, -1)}. Riprova.`);
                     throw error;
                 }
+            }
+
+            async deleteShopItem(itemId) {
+                if (confirm('Sei sicuro di voler eliminare questo prodotto?')) {
+                    try {
+                        await firebase.firestore().collection('shop').doc(itemId).delete();
+                        alert('Prodotto eliminato con successo!');
+                        
+                        // Remove from local storage
+                        delete this.currentShop[itemId];
+                        
+                        // Reload the list
+                        this.loadShop();
+
+                        // Notify portfolio loader if it exists (for main site)
+                        if (window.portfolioLoader) {
+                            await window.portfolioLoader.handlePortfolioChange('shop');
+                        }
+                    } catch (error) {
+                        console.error('Error deleting shop item:', error);
+                        alert('Errore nell\'eliminazione del prodotto. Riprova.');
+                    }
+                }
+            }
+
+            async editShopItem(itemId) {
+                console.log('Editing shop item:', itemId);
+                console.log('Current shop data:', this.currentShop);
+                
+                const item = this.currentShop[itemId];
+                
+                if (!item) {
+                    alert('Prodotto non trovato!');
+                    return;
+                }
+
+                console.log('Shop item data:', item);
+
+                // For now, show an alert with the shop item data
+                // TODO: Create edit modal for shop items
+                alert(`Editing shop item: ${item.title}\nPrice: ${item.price}\nThis feature will be implemented soon.`);
             }
         }
 
