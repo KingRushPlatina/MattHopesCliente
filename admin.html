@@ -743,19 +743,27 @@
                         <form id="site-settings-form">
                             <div class="row">
                                 <div class="col-md-6 mb-3">
-                                    <label for="shopUrl" class="form-label translatable" data-en="Shop URL" data-it="URL Negozio">Shop URL</label>
-                                    <input type="url" class="form-control" id="shopUrl" name="shopUrl" placeholder="https://yourshop.com">
-                                    <div class="form-text translatable" data-en="Leave empty to hide the shop button" data-it="Lascia vuoto per nascondere il pulsante negozio">Leave empty to hide the shop button</div>
+                                    <label for="coffeeUrl" class="form-label translatable" data-en="Buy Me a Coffee URL" data-it="URL Buy Me a Coffee">Buy Me a Coffee URL</label>
+                                    <input type="url" class="form-control" id="coffeeUrl" name="coffeeUrl" placeholder="https://www.buymeacoffee.com/yourusername" value="https://www.buymeacoffee.com/matthopes">
+                                    <div class="form-text translatable" data-en="Your Buy Me a Coffee profile URL" data-it="Il tuo URL del profilo Buy Me a Coffee">Your Buy Me a Coffee profile URL</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="shopButtonText" class="form-label translatable" data-en="Shop Button Text (English)" data-it="Testo Pulsante Negozio (Inglese)">Shop Button Text (English)</label>
-                                    <input type="text" class="form-control" id="shopButtonText" name="shopButtonText" placeholder="Shop" value="Shop">
-                                    <div class="form-text translatable" data-en="Text displayed on the shop button in English" data-it="Testo mostrato sul pulsante negozio in inglese">Text displayed on the shop button in English</div>
+                                    <label for="coffeeButtonText" class="form-label translatable" data-en="Coffee Button Text (English)" data-it="Testo Pulsante Caffè (Inglese)">Coffee Button Text (English)</label>
+                                    <input type="text" class="form-control" id="coffeeButtonText" name="coffeeButtonText" placeholder="Buy me a coffee" value="Buy me a coffee">
+                                    <div class="form-text translatable" data-en="Text displayed on the coffee button in English" data-it="Testo mostrato sul pulsante caffè in inglese">Text displayed on the coffee button in English</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="coffeeButtonTextIt" class="form-label translatable" data-en="Coffee Button Text (Italian)" data-it="Testo Pulsante Caffè (Italiano)">Coffee Button Text (Italian)</label>
+                                    <input type="text" class="form-control" id="coffeeButtonTextIt" name="coffeeButtonTextIt" placeholder="Offrimi un caffè" value="Offrimi un caffè">
+                                    <div class="form-text translatable" data-en="Text displayed on the coffee button in Italian" data-it="Testo mostrato sul pulsante caffè in italiano">Text displayed on the coffee button in Italian</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label for="shopButtonTextIt" class="form-label translatable" data-en="Shop Button Text (Italian)" data-it="Testo Pulsante Negozio (Italiano)">Shop Button Text (Italian)</label>
-                                    <input type="text" class="form-control" id="shopButtonTextIt" name="shopButtonTextIt" placeholder="Negozio" value="Negozio">
-                                    <div class="form-text translatable" data-en="Text displayed on the shop button in Italian" data-it="Testo mostrato sul pulsante negozio in italiano">Text displayed on the shop button in Italian</div>
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-coffee me-2"></i>
+                                        <span class="translatable" data-en="Coffee button is always visible and supports donations" data-it="Il pulsante caffè è sempre visibile e supporta le donazioni">Coffee button is always visible and supports donations</span>
+                                    </div>
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-purple">
@@ -1318,6 +1326,109 @@
                                                     <span class="badge bg-secondary me-1">tag1</span>
                                                     <span class="badge bg-secondary me-1">tag2</span>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-times me-2"></i>
+                                    <span class="translatable" data-en="Cancel" data-it="Annulla">Cancel</span>
+                                </button>
+                                <button type="submit" class="btn btn-purple">
+                                    <i class="fas fa-save me-2"></i>
+                                    <span class="translatable" data-en="Save Changes" data-it="Salva Modifiche">Save Changes</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Shop Modal -->
+        <div class="modal fade" id="editShopModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-edit me-2"></i>
+                            <span class="translatable" data-en="Edit Product" data-it="Modifica Prodotto">Edit Product</span>
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-shop-form">
+                            <input type="hidden" id="edit-shop-id">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Title" data-it="Titolo">Title</label>
+                                    <input type="text" class="form-control" id="edit-shop-title" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Price" data-it="Prezzo">Price</label>
+                                    <input type="text" class="form-control" id="edit-shop-price" placeholder="e.g. $29.99, €25.00, Free" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Custom Link" data-it="Link Personalizzato">Custom Link</label>
+                                    <input type="url" class="form-control" id="edit-shop-customLink" placeholder="https://example.com/buy-product" required>
+                                    <div class="form-text translatable" data-en="URL where users will be redirected when clicking the product" data-it="URL dove gli utenti verranno reindirizzati cliccando il prodotto">URL where users will be redirected when clicking the product</div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label translatable" data-en="Images (Any Image URLs)" data-it="Immagini (Qualsiasi URL Immagine)">Images (Any Image URLs)</label>
+                                    <input type="url" class="form-control mb-2" id="edit-shop-image1" placeholder="https://images.pexels.com/photos/34150/pexels-photo.jpg" required>
+                                    <input type="url" class="form-control mb-2" id="edit-shop-image2" placeholder="https://images.unsplash.com/photo-xyz/image.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-shop-image3" placeholder="https://your-cdn.com/image3.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-shop-image4" placeholder="https://imgur.com/image4.jpg">
+                                    <input type="url" class="form-control mb-2" id="edit-shop-image5" placeholder="https://any-image-host.com/image5.jpg">
+                                    <div class="form-text">Use any image URLs (Pexels, Unsplash, GitHub, Imgur, etc.). First image will be shown in grid view.</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Description" data-it="Descrizione">Description</label>
+                                <textarea class="form-control" id="edit-shop-description" rows="3" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Tags (comma separated)" data-it="Tag (separati da virgola)">Tags (comma separated)</label>
+                                <input type="text" class="form-control" id="edit-shop-tags" placeholder="e.g. digital, bundle, premium" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label translatable" data-en="Type Tags (comma separated - optional)" data-it="Tag Tipo (separati da virgola - opzionale)">Type Tags (comma separated - optional)</label>
+                                <input type="text" class="form-control" id="edit-shop-typeTags" placeholder="e.g. New, Featured, Limited">
+                                <div class="form-text translatable" data-en="Colored type tags that appear under the image" data-it="Tag colorati che appaiono sotto l'immagine">Colored type tags that appear under the image</div>
+                            </div>
+                            
+                            <!-- Preview Section -->
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-3">
+                                    <i class="fas fa-eye me-2"></i>
+                                    <span class="translatable" data-en="Preview" data-it="Anteprima">Preview</span>
+                                </h6>
+                                <div class="border rounded p-3" style="background-color: var(--card-bg-light);">
+                                    <div id="shop-preview">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="position-relative">
+                                                    <img id="preview-shop-image" src="https://via.placeholder.com/300x200?text=Product+Preview" alt="Preview" class="img-fluid rounded" style="width: 100%; height: 150px; object-fit: cover;">
+                                                    <div class="position-absolute top-0 end-0 m-2">
+                                                        <span id="preview-shop-price" class="badge bg-purple">$0.00</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <h5 id="preview-shop-title">Product Title</h5>
+                                                <p id="preview-shop-description" class="text-muted">Product description will appear here...</p>
+                                                <div id="preview-shop-tags" class="mb-2">
+                                                    <span class="badge bg-secondary me-1">tag1</span>
+                                                    <span class="badge bg-secondary me-1">tag2</span>
+                                                </div>
+                                                <button class="btn btn-purple btn-sm" disabled>
+                                                    <i class="fas fa-shopping-cart me-1"></i>Buy Now
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -2426,7 +2537,6 @@
 
             async editShopItem(itemId) {
                 console.log('Editing shop item:', itemId);
-                console.log('Current shop data:', this.currentShop);
                 
                 const item = this.currentShop[itemId];
                 
@@ -2435,11 +2545,141 @@
                     return;
                 }
 
-                console.log('Shop item data:', item);
+                // Populate the edit form
+                document.getElementById('edit-shop-id').value = itemId;
+                document.getElementById('edit-shop-title').value = item.title || '';
+                document.getElementById('edit-shop-price').value = item.price || '';
+                document.getElementById('edit-shop-customLink').value = item.customLink || '';
+                document.getElementById('edit-shop-description').value = item.description || '';
+                document.getElementById('edit-shop-tags').value = Array.isArray(item.tags) ? item.tags.join(', ') : '';
+                document.getElementById('edit-shop-typeTags').value = Array.isArray(item.typeTags) ? item.typeTags.join(', ') : '';
 
-                // For now, show an alert with the shop item data
-                // TODO: Create edit modal for shop items
-                alert(`Editing shop item: ${item.title}\nPrice: ${item.price}\nThis feature will be implemented soon.`);
+                // Handle images
+                const images = item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []);
+                document.getElementById('edit-shop-image1').value = images[0] || '';
+                document.getElementById('edit-shop-image2').value = images[1] || '';
+                document.getElementById('edit-shop-image3').value = images[2] || '';
+                document.getElementById('edit-shop-image4').value = images[3] || '';
+                document.getElementById('edit-shop-image5').value = images[4] || '';
+
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('editShopModal'));
+                modal.show();
+
+                // Setup form submission
+                this.setupEditShopForm();
+            }
+
+            setupEditShopForm() {
+                const form = document.getElementById('edit-shop-form');
+                
+                // Remove existing listeners
+                const newForm = form.cloneNode(true);
+                form.parentNode.replaceChild(newForm, form);
+                
+                newForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    
+                    const itemId = document.getElementById('edit-shop-id').value;
+                    const title = document.getElementById('edit-shop-title').value.trim();
+                    const price = document.getElementById('edit-shop-price').value.trim();
+                    const customLink = document.getElementById('edit-shop-customLink').value.trim();
+                    const description = document.getElementById('edit-shop-description').value.trim();
+                    const tags = document.getElementById('edit-shop-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                    const typeTags = document.getElementById('edit-shop-typeTags').value.split(',').map(tag => tag.trim()).filter(tag => tag);
+
+                    // Collect images
+                    const images = [
+                        document.getElementById('edit-shop-image1').value.trim(),
+                        document.getElementById('edit-shop-image2').value.trim(),
+                        document.getElementById('edit-shop-image3').value.trim(),
+                        document.getElementById('edit-shop-image4').value.trim(),
+                        document.getElementById('edit-shop-image5').value.trim()
+                    ].filter(img => img);
+
+                    if (!title || !description || !price || !customLink || images.length === 0) {
+                        alert('Compila tutti i campi obbligatori e aggiungi almeno un\'immagine!');
+                        return;
+                    }
+
+                    try {
+                        const updateData = {
+                            title,
+                            price,
+                            customLink,
+                            description,
+                            tags,
+                            typeTags,
+                            images,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        };
+
+                        await firebase.firestore().collection('shop').doc(itemId).update(updateData);
+                        
+                        alert('Prodotto aggiornato con successo!');
+                        
+                        // Close modal
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('editShopModal'));
+                        modal.hide();
+                        
+                        // Reload shop items
+                        this.loadShop();
+                        
+                        // Notify portfolio loader if available
+                        if (window.portfolioLoader) {
+                            window.portfolioLoader.handlePortfolioChange('shop');
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error updating shop item:', error);
+                        alert('Errore nell\'aggiornamento del prodotto. Riprova.');
+                    }
+                });
+
+                // Setup real-time preview
+                this.setupShopEditPreview();
+            }
+
+            setupShopEditPreview() {
+                const titleInput = document.getElementById('edit-shop-title');
+                const priceInput = document.getElementById('edit-shop-price');
+                const descriptionInput = document.getElementById('edit-shop-description');
+                const tagsInput = document.getElementById('edit-shop-tags');
+                const image1Input = document.getElementById('edit-shop-image1');
+
+                const previewTitle = document.getElementById('preview-shop-title');
+                const previewPrice = document.getElementById('preview-shop-price');
+                const previewDescription = document.getElementById('preview-shop-description');
+                const previewTags = document.getElementById('preview-shop-tags');
+                const previewImage = document.getElementById('preview-shop-image');
+
+                function updatePreview() {
+                    previewTitle.textContent = titleInput.value || 'Product Title';
+                    previewPrice.textContent = priceInput.value || '$0.00';
+                    previewDescription.textContent = descriptionInput.value || 'Product description will appear here...';
+                    
+                    if (image1Input.value) {
+                        previewImage.src = image1Input.value;
+                    } else {
+                        previewImage.src = 'https://via.placeholder.com/300x200?text=Product+Preview';
+                    }
+
+                    // Update tags
+                    const tags = tagsInput.value.split(',').map(tag => tag.trim()).filter(tag => tag);
+                    if (tags.length > 0) {
+                        previewTags.innerHTML = tags.map(tag => `<span class="badge bg-secondary me-1">${tag}</span>`).join('');
+                    } else {
+                        previewTags.innerHTML = '<span class="badge bg-secondary me-1">tag1</span><span class="badge bg-secondary me-1">tag2</span>';
+                    }
+                }
+
+                // Initial update
+                updatePreview();
+
+                // Add listeners
+                [titleInput, priceInput, descriptionInput, tagsInput, image1Input].forEach(input => {
+                    input.addEventListener('input', updatePreview);
+                });
             }
         }
 
@@ -2468,9 +2708,9 @@
                     const doc = await firebase.firestore().collection('settings').doc('site').get();
                     if (doc.exists) {
                         const settings = doc.data();
-                        document.getElementById('shopUrl').value = settings.shopUrl || '';
-                        document.getElementById('shopButtonText').value = settings.shopButtonText || 'Shop';
-                        document.getElementById('shopButtonTextIt').value = settings.shopButtonTextIt || 'Negozio';
+                        document.getElementById('coffeeUrl').value = settings.coffeeUrl || 'https://www.buymeacoffee.com/matthopes';
+                        document.getElementById('coffeeButtonText').value = settings.coffeeButtonText || 'Buy me a coffee';
+                        document.getElementById('coffeeButtonTextIt').value = settings.coffeeButtonTextIt || 'Offrimi un caffè';
                     }
                 } catch (error) {
                     console.error('Error loading site settings:', error);
@@ -2479,14 +2719,14 @@
 
             async saveSettings() {
                 try {
-                    const shopUrl = document.getElementById('shopUrl').value.trim();
-                    const shopButtonText = document.getElementById('shopButtonText').value.trim() || 'Shop';
-                    const shopButtonTextIt = document.getElementById('shopButtonTextIt').value.trim() || 'Negozio';
+                    const coffeeUrl = document.getElementById('coffeeUrl').value.trim();
+                    const coffeeButtonText = document.getElementById('coffeeButtonText').value.trim() || 'Buy me a coffee';
+                    const coffeeButtonTextIt = document.getElementById('coffeeButtonTextIt').value.trim() || 'Offrimi un caffè';
 
                     const settings = {
-                        shopUrl: shopUrl,
-                        shopButtonText: shopButtonText,
-                        shopButtonTextIt: shopButtonTextIt,
+                        coffeeUrl: coffeeUrl,
+                        coffeeButtonText: coffeeButtonText,
+                        coffeeButtonTextIt: coffeeButtonTextIt,
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
 
@@ -2506,7 +2746,7 @@
             notifyMainSite(settings) {
                 // Try to communicate with main site
                 try {
-                    localStorage.setItem('shopSettings', JSON.stringify(settings));
+                    localStorage.setItem('coffeeSettings', JSON.stringify(settings));
                     // Dispatch custom event for other tabs
                     window.dispatchEvent(new CustomEvent('shopSettingsUpdated', { detail: settings }));
                 } catch (error) {

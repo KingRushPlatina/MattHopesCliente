@@ -627,9 +627,9 @@ function initializeLanguage() {
             }
         });
         
-        // Update shop elements text for new language
+        // Update coffee button text for new language
         if (window.shopManager) {
-            shopManager.updateShopTexts();
+            shopManager.updateCoffeeButtonText();
         }
     }
 
@@ -811,11 +811,19 @@ class ShopSettingsManager {
             if (doc.exists) {
                 this.settings = doc.data();
             } else {
-                this.settings = { shopUrl: '', shopButtonText: 'Shop', shopButtonTextIt: 'Negozio' };
+                this.settings = { 
+                    coffeeUrl: 'https://www.buymeacoffee.com/matthopes', 
+                    coffeeButtonText: 'Buy me a coffee', 
+                    coffeeButtonTextIt: 'Offrimi un caffè' 
+                };
             }
         } catch (error) {
-            console.error('Error loading shop settings:', error);
-            this.settings = { shopUrl: '', shopButtonText: 'Shop', shopButtonTextIt: 'Negozio' };
+            console.error('Error loading coffee settings:', error);
+            this.settings = { 
+                coffeeUrl: 'https://www.buymeacoffee.com/matthopes', 
+                coffeeButtonText: 'Buy me a coffee', 
+                coffeeButtonTextIt: 'Offrimi un caffè' 
+            };
         }
     }
 
@@ -824,15 +832,16 @@ class ShopSettingsManager {
 
         const hasShopUrl = this.settings.shopUrl && this.settings.shopUrl.trim();
         
-        // Update navbar shop button
-        const shopButton = document.getElementById('shopButton');
-        if (shopButton) {
-            if (hasShopUrl) {
-                shopButton.href = this.settings.shopUrl;
-                shopButton.style.display = 'inline-flex';
-            } else {
-                shopButton.style.display = 'none';
+        // Update coffee button with dynamic settings
+        const coffeeButton = document.getElementById('coffeeButton');
+        if (coffeeButton && this.settings) {
+            // Update URL if provided
+            if (this.settings.coffeeUrl) {
+                coffeeButton.href = this.settings.coffeeUrl;
             }
+            
+            // Update button text based on current language
+            this.updateCoffeeButtonText();
         }
         
         // Update contact section shop item
@@ -858,45 +867,23 @@ class ShopSettingsManager {
             }
         }
 
-        // Update text based on current language
-        this.updateShopTexts();
+        // Update coffee button text based on current language
+        this.updateCoffeeButtonText();
     }
 
-    updateShopTexts() {
+    updateCoffeeButtonText() {
         if (!this.settings) return;
 
         const currentLanguage = localStorage.getItem('language') || 'en';
         
-        // Update navbar button text
-        const shopButtonText = document.querySelector('#shopButton .translatable');
-        if (shopButtonText) {
-            shopButtonText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
-            shopButtonText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
-            const translation = shopButtonText.getAttribute(`data-${currentLanguage}`);
+        // Update coffee button text
+        const coffeeButtonText = document.querySelector('#coffeeButton .translatable');
+        if (coffeeButtonText) {
+            coffeeButtonText.setAttribute('data-en', this.settings.coffeeButtonText || 'Buy me a coffee');
+            coffeeButtonText.setAttribute('data-it', this.settings.coffeeButtonTextIt || 'Offrimi un caffè');
+            const translation = coffeeButtonText.getAttribute(`data-${currentLanguage}`);
             if (translation) {
-                shopButtonText.textContent = translation;
-            }
-        }
-        
-        // Update contact section text
-        const shopContactText = document.querySelector('#shopContactItem h5');
-        if (shopContactText) {
-            shopContactText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
-            shopContactText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
-            const translation = shopContactText.getAttribute(`data-${currentLanguage}`);
-            if (translation) {
-                shopContactText.textContent = translation;
-            }
-        }
-
-        // Update footer text
-        const shopFooterText = document.getElementById('shopFooterLink');
-        if (shopFooterText) {
-            shopFooterText.setAttribute('data-en', this.settings.shopButtonText || 'Shop');
-            shopFooterText.setAttribute('data-it', this.settings.shopButtonTextIt || 'Negozio');
-            const translation = shopFooterText.getAttribute(`data-${currentLanguage}`);
-            if (translation) {
-                shopFooterText.textContent = translation;
+                coffeeButtonText.textContent = translation;
             }
         }
     }
@@ -905,30 +892,41 @@ class ShopSettingsManager {
         // Listen for settings updates from admin
         window.addEventListener('shopSettingsUpdated', (event) => {
             this.settings = event.detail;
-            this.updateAllShopElements();
+            this.updateAllCoffeeElements();
         });
 
         // Listen for localStorage changes (from admin in another tab)
         window.addEventListener('storage', (event) => {
-            if (event.key === 'shopSettings') {
+            if (event.key === 'coffeeSettings') {
                 try {
                     this.settings = JSON.parse(event.newValue);
-                    this.updateAllShopElements();
+                    this.updateAllCoffeeElements();
                 } catch (error) {
-                    console.error('Error parsing shop settings from localStorage:', error);
+                    console.error('Error parsing coffee settings from localStorage:', error);
                 }
             }
         });
     }
 
+    updateAllCoffeeElements() {
+        // Update coffee button URL
+        const coffeeButton = document.getElementById('coffeeButton');
+        if (coffeeButton && this.settings && this.settings.coffeeUrl) {
+            coffeeButton.href = this.settings.coffeeUrl;
+        }
+        
+        // Update text based on current language
+        this.updateCoffeeButtonText();
+    }
+
     // Public method to refresh settings
     async refreshSettings() {
         await this.loadSettings();
-        this.updateAllShopElements();
+        this.updateAllCoffeeElements();
     }
 }
 
-// Initialize shop manager when page loads
+// Coffee button is static - minimal shop manager needed
 let shopManager;
 
 // Function to redirect to shop item
@@ -938,4 +936,114 @@ function redirectToShopItem(customLink) {
     } else {
         console.warn('No custom link provided for this shop item');
     }
+}
+
+// Function to show shop item details in modal
+function showShopItemDetails(itemId) {
+    // Get item data from portfolio loader
+    if (!window.portfolioLoader || !window.portfolioLoader.shop) {
+        console.error('Portfolio data not loaded');
+        return;
+    }
+    
+    const item = window.portfolioLoader.shop.find(shopItem => shopItem.id === itemId);
+    if (!item) {
+        console.error('Shop item not found:', itemId);
+        return;
+    }
+    
+    // Populate modal with item data
+    populateShopDetailsModal(item);
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('shopDetailsModal'));
+    modal.show();
+}
+
+// Function to populate shop details modal
+function populateShopDetailsModal(item) {
+    // Handle images
+    const images = item.images && Array.isArray(item.images) ? item.images : (item.image ? [item.image] : []);
+    const mainImage = document.getElementById('shopDetailMainImage');
+    const thumbnailsContainer = document.getElementById('shopDetailThumbnails');
+    
+    if (images.length > 0) {
+        mainImage.src = images[0];
+        mainImage.alt = item.title;
+        
+        // Create thumbnails
+        thumbnailsContainer.innerHTML = '';
+        images.forEach((imageUrl, index) => {
+            const thumbnail = document.createElement('img');
+            thumbnail.src = imageUrl;
+            thumbnail.alt = `${item.title} - Image ${index + 1}`;
+            thumbnail.className = 'img-thumbnail shop-thumbnail';
+            thumbnail.style.cssText = 'width: 80px; height: 60px; object-fit: cover; cursor: pointer;';
+            thumbnail.onclick = () => {
+                mainImage.src = imageUrl;
+                // Remove active class from all thumbnails
+                thumbnailsContainer.querySelectorAll('.shop-thumbnail').forEach(thumb => {
+                    thumb.classList.remove('border-purple');
+                });
+                // Add active class to clicked thumbnail
+                thumbnail.classList.add('border-purple');
+            };
+            
+            // Make first thumbnail active
+            if (index === 0) {
+                thumbnail.classList.add('border-purple');
+            }
+            
+            thumbnailsContainer.appendChild(thumbnail);
+        });
+    } else {
+        mainImage.src = 'https://via.placeholder.com/400x300?text=No+Image';
+        thumbnailsContainer.innerHTML = '';
+    }
+    
+    // Populate text content
+    document.getElementById('shopDetailTitle').textContent = item.title || 'Untitled Product';
+    document.getElementById('shopDetailPrice').textContent = item.price || 'Price on request';
+    document.getElementById('shopDetailDescription').textContent = item.description || 'No description available';
+    
+    // Populate tags
+    const tagsContainer = document.getElementById('shopDetailTags');
+    if (item.tags && item.tags.length > 0) {
+        tagsContainer.innerHTML = item.tags.map(tag => {
+            const colorClasses = [
+                'bg-primary', 'bg-success', 'bg-danger', 'bg-info',
+                'bg-warning text-dark', 'bg-secondary', 'bg-dark'
+            ];
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            return `<span class="badge ${randomColorClass} me-1 mb-1">${tag}</span>`;
+        }).join('');
+    } else {
+        tagsContainer.innerHTML = '<span class="text-muted">No tags</span>';
+    }
+    
+    // Populate type tags if available
+    const typeTagsContainer = document.getElementById('shopDetailTypeTagsContainer');
+    const typeTags = document.getElementById('shopDetailTypeTags');
+    if (item.typeTags && item.typeTags.length > 0) {
+        typeTagsContainer.style.display = 'block';
+        typeTags.innerHTML = item.typeTags.map(tag => {
+            const colorClasses = [
+                'bg-purple', 'bg-gradient-purple', 'bg-info', 'bg-success'
+            ];
+            const randomColorClass = colorClasses[Math.floor(Math.random() * colorClasses.length)];
+            return `<span class="badge ${randomColorClass} me-1 mb-1">${tag}</span>`;
+        }).join('');
+    } else {
+        typeTagsContainer.style.display = 'none';
+    }
+    
+    // Setup buy button
+    const buyButton = document.getElementById('shopDetailBuyButton');
+    buyButton.onclick = () => {
+        if (item.customLink && item.customLink !== '#') {
+            window.open(item.customLink, '_blank');
+        } else {
+            alert('Purchase link not available for this product.');
+        }
+    };
 }

@@ -76,9 +76,9 @@
                         </a></li>
                     </ul>
                 </div>
-                <a href="#" class="btn btn-outline-purple me-3" id="shopButton" style="display: none;" target="_blank">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="translatable" data-en="Shop" data-it="Negozio">Shop</span>
+                <a href="https://www.buymeacoffee.com/matthopes" class="btn btn-outline-purple me-3" id="coffeeButton" style="display: inline-flex;" target="_blank">
+                    <i class="fas fa-coffee"></i>
+                    <span class="translatable" data-en="Buy me a coffee" data-it="Offrimi un caffè">Buy me a coffee</span>
                 </a>
                 <button class="theme-toggle" id="themeToggle">
                     <i class="fas fa-moon"></i>
@@ -789,6 +789,76 @@
     <!-- Back to Top Button -->
     <div class="back-to-top" id="backToTop">
         <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Shop Item Details Modal -->
+    <div class="modal fade" id="shopDetailsModal" tabindex="-1" aria-labelledby="shopDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="shopDetailsModalLabel">
+                        <i class="fas fa-shopping-cart me-2"></i>
+                        <span class="translatable" data-en="Product Details" data-it="Dettagli Prodotto">Product Details</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Image Gallery -->
+                        <div class="col-md-6 mb-4">
+                            <div class="shop-detail-images">
+                                <div class="main-image-container mb-3">
+                                    <img id="shopDetailMainImage" src="" alt="" class="img-fluid rounded shadow" style="width: 100%; height: 400px; object-fit: cover;">
+                                </div>
+                                <div class="thumbnail-images d-flex flex-wrap gap-2" id="shopDetailThumbnails">
+                                    <!-- Thumbnail images will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="col-md-6">
+                            <div class="shop-detail-info">
+                                <h3 id="shopDetailTitle" class="mb-3">Product Title</h3>
+                                <div class="price-tag mb-4">
+                                    <span class="h4 text-purple fw-bold" id="shopDetailPrice">$0.00</span>
+                                </div>
+                                
+                                <div class="product-description mb-4">
+                                    <h6 class="translatable" data-en="Description" data-it="Descrizione">Description</h6>
+                                    <p id="shopDetailDescription" class="text-muted">Product description will appear here...</p>
+                                </div>
+                                
+                                <div class="product-tags mb-4">
+                                    <h6 class="translatable" data-en="Tags" data-it="Tag">Tags</h6>
+                                    <div id="shopDetailTags">
+                                        <!-- Tags will be populated here -->
+                                    </div>
+                                </div>
+                                
+                                <div class="product-type-tags mb-4" id="shopDetailTypeTagsContainer" style="display: none;">
+                                    <h6 class="translatable" data-en="Features" data-it="Caratteristiche">Features</h6>
+                                    <div id="shopDetailTypeTags">
+                                        <!-- Type tags will be populated here -->
+                                    </div>
+                                </div>
+                                
+                                <div class="product-actions d-grid gap-2">
+                                    <button type="button" class="btn btn-purple btn-lg" id="shopDetailBuyButton">
+                                        <i class="fas fa-shopping-cart me-2"></i>
+                                        <span class="translatable" data-en="Buy Now" data-it="Acquista Ora">Buy Now</span>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                        <i class="fas fa-arrow-left me-2"></i>
+                                        <span class="translatable" data-en="Back to Shop" data-it="Torna al Negozio">Back to Shop</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

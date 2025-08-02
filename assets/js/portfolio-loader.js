@@ -190,7 +190,7 @@ class PortfolioLoader {
             const truncatedDescription = description.length > 100 ? description.substring(0, 100) + '...' : description;
             
             return `
-            <div class="shop-item" data-tags="${(item.tags || []).join(' ')}" onclick="redirectToShopItem('${item.customLink || '#'}')">
+            <div class="shop-item" data-tags="${(item.tags || []).join(' ')}" onclick="showShopItemDetails('${item.id}')">
                 <div class="portfolio-img-container">
                     <img src="${firstImage}" alt="${item.title}">
                     <div class="shop-price-overlay">
